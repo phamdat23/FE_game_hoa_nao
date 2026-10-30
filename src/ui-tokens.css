@@ -1,0 +1,95 @@
+/**
+ * ===================================================================
+ * HỌA NÁO DESIGN SYSTEM & UI TOKENS
+ * ===================================================================
+ * Tập trung toàn bộ biến màu sắc, typography, khoảng cách, radius,
+ * bóng đổ (shadows) và âm thanh để đảm bảo giao diện nhất quán 100%
+ * xuyên suốt tất cả các Sprint và các Mini-game mở rộng sau này.
+ */
+
+:root {
+  /* --- PALETTE MÀU CHỦ ĐẠO (GEN Z CYBER-POP / DARK MODE) --- */
+  --color-bg-base: #0a0f1d;          /* Nền chính đậm sâu */
+  --color-bg-card: #141d33;          /* Nền card nổi */
+  --color-bg-card-subtle: #1c2744;   /* Nền phụ, toolbar */
+  --color-bg-surface: #243256;       /* Nền hover, chip */
+
+  /* --- BRAND ACCENTS & NEON GLOW --- */
+  --color-brand-primary: #6366f1;    /* Tím Indigo chủ đạo */
+  --color-brand-glow: #818cf8;       /* Sáng viền tím */
+  --color-brand-secondary: #ec4899;  /* Hồng Neon phá cách */
+  --color-brand-gradient: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+  --color-brand-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #db2777 100%);
+
+  /* --- STATE COLORS (TRẠNG THÁI) --- */
+  --color-success: #10b981;          /* Xanh lá: Đoán đúng, Sẵn sàng */
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-warning: #facc15;          /* Vàng: Thời gian đếm ngược, Gần đúng */
+  --color-warning-bg: rgba(250, 204, 21, 0.15);
+  --color-danger: #ef4444;           /* Đỏ: Hết giờ, Nút xóa, Lỗi */
+  --color-danger-bg: rgba(239, 68, 68, 0.15);
+  --color-info: #38bdf8;             /* Xanh cyan: Từ khóa, Điểm số, Mã phòng */
+  --color-info-bg: rgba(56, 189, 248, 0.15);
+
+  /* --- BẢNG MÀU VẼ CHUẨN (PALETTE CHO CANVAS) --- */
+  --palette-black: #1e1e24;
+  --palette-red: #ef4444;
+  --palette-orange: #f97316;
+  --palette-yellow: #eab308;
+  --palette-green: #22c55e;
+  --palette-cyan: #06b6d4;
+  --palette-blue: #3b82f6;
+  --palette-purple: #a855f7;
+  --palette-pink: #ec4899;
+  --palette-white: #ffffff;
+
+  /* --- TEXT & TYPOGRAPHY --- */
+  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-text-primary: #f8fafc;     /* Chữ tiêu đề & nội dung quan trọng */
+  --color-text-secondary: #94a3b8;   /* Chữ phụ, nhãn, gợi ý */
+  --color-text-disabled: #64748b;    /* Chữ mờ, placeholder */
+  
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-base: 1rem;    /* 16px */
+  --font-size-lg: 1.125rem;  /* 18px */
+  --font-size-xl: 1.35rem;   /* 21.6px */
+  --font-size-2xl: 1.75rem;  /* 28px */
+  --font-size-3xl: 2.25rem;  /* 36px */
+
+  --font-weight-normal: 500;
+  --font-weight-semibold: 700;
+  --font-weight-extrabold: 800;
+
+  /* --- BORDERS & OUTLINES --- */
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
+  --border-card: 1px solid rgba(255, 255, 255, 0.12);
+  --border-focus: 1px solid var(--color-brand-glow);
+  --border-active: 1px solid rgba(255, 255, 255, 0.3);
+
+  /* --- BORDER RADIUS (BO GÓC BO TRÒN) --- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-3xl: 36px;
+  --radius-full: 9999px;
+
+  /* --- SHADOWS & NEON GLOW EFFECTS --- */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-modal: 0 25px 60px rgba(0, 0, 0, 0.6);
+  --glow-primary: 0 0 20px rgba(99, 102, 241, 0.45);
+  --glow-pink: 0 0 20px rgba(236, 72, 153, 0.45);
+  --glow-cyan: 0 0 16px rgba(56, 189, 248, 0.5);
+
+  /* --- TRANSITIONS & ANIMATIONS --- */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* --- SPACING & SIZING --- */
+  --max-content-width: 1440px;
+  --header-height: 64px;
+}

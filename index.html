@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <title>Họa Náo - Vẽ Bung Nét, Đoán Hết Mình 🎨</title>
+  <link rel="icon" type="image/jpeg" href="/logo.jpg">
+  <meta property="og:title" content="Họa Náo - Vẽ Bung Nét, Đoán Hết Mình">
+  <meta property="og:image" content="/logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <div id="app" class="game-container">
+    <!-- Screen 1: Home / Lobby Page -->
+    <div id="lobbyScreen" class="home-screen active">
+      <!-- Top Bar -->
+      <header class="home-topbar">
+        <div class="topbar-brand">
+          <span class="logo-img-badge"><img src="/logo.jpg" alt="Họa Náo"></span>
+          <div class="brand-text-group">
+            <h1 class="logo-title">Họa Náo</h1>
+            <span class="logo-tagline">Vẽ Bung Nét, Đoán Hết Mình</span>
+          </div>
+        </div>
+
+        <!-- User Profile Quick Settings in Top Bar -->
+        <div class="topbar-user-section">
+          <div class="player-profile-badge">
+            <div class="custom-avatar-dropdown" id="avatarDropdown">
+              <button type="button" class="avatar-trigger-btn" id="avatarTriggerBtn" title="Chọn hình đại diện">
+                <span class="current-avatar-emoji" id="currentAvatarEmoji">🦊</span>
+                <span class="dropdown-chevron">▾</span>
+              </button>
+              <div class="avatar-popover" id="avatarPopover">
+                <div class="avatar-popover-title">Chọn hình đại diện</div>
+                <div class="avatar-grid-list" id="avatarGridList">
+                  <!-- Danh sách avatar sẽ được render tại đây -->
+                </div>
+              </div>
+            </div>
+            <!-- Giữ hidden input hoặc proxy value để tương thích với các module khác -->
+            <input type="hidden" id="avatarSelect" value="🦊">
+            <input type="text" id="nicknameInput" class="nickname-top-input" placeholder="Nhập tên của bạn..." maxlength="15" value="Game Thủ">
+          </div>
+        </div>
+
+        <!-- Top Bar Action: Tạo phòng & Vào phòng nhanh -->
+        <div class="topbar-actions">
+          <div class="quick-join-wrapper">
+            <input type="text" id="roomCodeInput" placeholder="Mã phòng..." maxlength="6" class="quick-code-input" style="text-transform: uppercase;">
+            <button id="joinRoomBtn" class="btn btn-secondary btn-sm" title="Vào phòng ngay">
+              <span>Vào phòng</span>
+            </button>
+          </div>
+          <button id="createRoomBtn" class="btn btn-primary btn-create-room">
+            <span class="btn-icon">✨</span>
+            <span>Tạo phòng</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Content: Chọn Chế Độ Chơi (Game Modes Selection) -->
+      <main class="home-main">
+        <div class="modes-hero-header">
+          <div class="hero-badge">CHẾ ĐỘ TRÒ CHƠI</div>
+          <h2 class="modes-main-title">Chọn Chế Độ Chơi</h2>
+          <p class="modes-sub-title">Khám phá các thể thức thi đấu vẽ hình đoán từ cực đỉnh cùng hội bạn thân!</p>
+        </div>
+
+        <div class="game-modes-grid" id="gameModesContainer">
+          <!-- Chế độ 1: Luân Phiên (Mặc định - Đang hoạt động) -->
+          <div class="game-mode-card active selected" data-mode="turn-based" id="modeTurnBased">
+            <div class="card-status-badge">
+              <span class="pulse-indicator-dot"></span>
+              <span>Đang áp dụng</span>
+            </div>
+            <div class="mode-icon-circle rotate-effect">🎨</div>
+            <div class="mode-content">
+              <div class="mode-header-row">
+                <h3 class="mode-name">Luân Phiên Cổ Điển</h3>
+                <span class="mode-tag mode-tag-highlight">Cổ điển</span>
+              </div>
+              <p class="mode-desc">
+                Luân phiên vẽ gợi ý từ khóa bí mật, cả phòng tranh tài đoán đúng nhanh nhất để ghi điểm cao!
+              </p>
+              <div class="mode-features-list">
+                <div class="feature-item">
+                  <span class="feature-icon">⏱️</span>
+                  <span>Vẽ 60s / lượt</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">👥</span>
+                  <span>2 – 16 người chơi</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">🏆</span>
+                  <span>Đua top điểm số</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-action-bar">
+              <button class="btn btn-primary btn-play-mode" id="playTurnBasedBtn">
+                <span>Vào Chơi Ngay (Luân phiên)</span>
+                <span class="arrow-icon">➔</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chế độ 2: Đấu Nhanh (Sắp ra mắt) -->
+          <div class="game-mode-card disabled" data-mode="speed-run">
+            <div class="card-status-badge badge-upcoming">
+              <span>Sắp ra mắt</span>
+            </div>
+            <div class="mode-icon-circle">⚡</div>
+            <div class="mode-content">
+              <div class="mode-header-row">
+                <h3 class="mode-name">Đấu Tốc Độ 1v1</h3>
+                <span class="mode-tag">Đối kháng</span>
+              </div>
+              <p class="mode-desc">
+                Solo 1 đối 1 chớp nhoáng 30 giây! Thử thách phản xạ vẽ nhanh và đoán siêu tốc để hạ gục đối thủ.
+              </p>
+              <div class="mode-features-list">
+                <div class="feature-item">
+                  <span class="feature-icon">⚡</span>
+                  <span>Vòng đấu 30s</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">🥊</span>
+                  <span>Solo 1v1 gay cấn</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">🔥</span>
+                  <span>Căng não phản xạ</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-action-bar">
+              <button class="btn btn-secondary btn-play-mode" disabled>
+                <span>Chưa mở</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chế độ 3: Đại Chiến Tiếp Sức (Sắp ra mắt) -->
+          <div class="game-mode-card disabled" data-mode="relay">
+            <div class="card-status-badge badge-upcoming">
+              <span>Sắp ra mắt</span>
+            </div>
+            <div class="mode-icon-circle">🤝</div>
+            <div class="mode-content">
+              <div class="mode-header-row">
+                <h3 class="mode-name">Vẽ Tiếp Sức</h3>
+                <span class="mode-tag">Đồng đội</span>
+              </div>
+              <p class="mode-desc">
+                Nối tiếp nét vẽ trên cùng bức tranh bí ẩn cùng đồng đội, giải mã nhanh hơn đối phương để chiến thắng!
+              </p>
+              <div class="mode-features-list">
+                <div class="feature-item">
+                  <span class="feature-icon">🤝</span>
+                  <span>Team 2v2 / 3v3</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">🧩</span>
+                  <span>Ghép tranh tiếp sức</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">🎉</span>
+                  <span>Phối hợp ăn ý</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-action-bar">
+              <button class="btn btn-secondary btn-play-mode" disabled>
+                <span>Chưa mở</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Nút Kho Từ Khóa xếp gọn tại góc màn hình sảnh (Mặc định ẩn, kiểm tra quyền truy cập qua Firebase Remote Config ip_config) -->
+      <a href="/admin.html" class="corner-wordbank-btn" id="cornerWordBankBtn" title="Quản lý kho từ khóa Database" style="display: none;">
+        <span class="btn-icon">📚</span>
+        <span class="btn-text">Kho Từ Khóa</span>
+      </a>
+    </div>
+
+    <!-- Screen 2: Dedicated Waiting Room (Màn hình phòng chờ toàn diện, không dùng popup) -->
+    <div id="waitingRoomScreen" class="waiting-room-screen">
+      <!-- Top Navigation Bar của Màn hình Phòng Chờ -->
+      <header class="waiting-topbar">
+        <div class="topbar-brand">
+          <span class="logo-img-badge"><img src="/logo.jpg" alt="Họa Náo"></span>
+          <div class="brand-text-group">
+            <h1 class="logo-title">Họa Náo</h1>
+            <span class="logo-tagline">Phòng Chờ Trực Tiếp</span>
+          </div>
+        </div>
+
+        <div class="waiting-topbar-center">
+          <div class="badge-waiting-pill">
+            <span class="pulse-dot"></span>
+            <span>ĐANG CHỜ BẮT ĐẦU TRẬN ĐẤU</span>
+          </div>
+        </div>
+
+        <div class="waiting-topbar-actions">
+          <!-- CÁC NÚT DÀNH RIÊNG CHO CHỦ PHÒNG (Chủ phòng mới có Cài đặt và Thoát phòng) -->
+          <div id="hostTopbarActions" class="host-topbar-actions" style="display: none;">
+            <button id="roomSettingsBtn" class="btn-icon-circle btn-settings-icon" title="Cài đặt phòng chơi (Chủ phòng)" aria-label="Cài đặt">
+              <span class="btn-icon-glyph">⚙️</span>
+            </button>
+            <button id="closeWaitingRoomBtn" class="btn btn-exit-room" title="Thoát phòng về trang chủ">
+              <span class="exit-glyph">✕</span>
+              <span>Thoát phòng</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Stage của Màn hình Phòng Chờ -->
+      <main class="waiting-main-container">
+        <div class="waiting-room-card compact-fit">
+          <div class="waiting-room-grid-layout">
+            <!-- Cột trái: Mã phòng & Hành động của Host/Guest -->
+            <div class="waiting-col-left">
+              <div class="room-code-display-box compact">
+                <span class="code-label">MÃ PHÒNG CỦA BẠN</span>
+                <div class="code-row">
+                  <span class="code-digits" id="waitingCodeVal">------</span>
+                  <button id="copyCodeBtn" class="btn btn-copy" title="Sao chép mã phòng">
+                    <span>📋 Copy</span>
+                  </button>
+                </div>
+                <p class="copy-success-hint" id="copySuccessHint" style="display: none;">Đã sao chép vào bộ nhớ tạm! 🎉</p>
+                <p class="invite-hint">Gửi mã này cho bạn bè để cùng tham gia nhé!</p>
+              </div>
+
+              <div class="waiting-actions-area compact">
+                <!-- CHỈ CHỦ PHÒNG MỚI CÓ NÚT BẮT ĐẦU -->
+                <div id="waitingHostControls" class="host-controls">
+                  <button id="waitingStartGameBtn" class="btn btn-success-large">
+                    <span>🚀 Bắt đầu trận đấu</span>
+                  </button>
+                  <p class="waiting-hint" id="playerCountWarning">Cần ít nhất 2 người chơi để bắt đầu cuộc thi tài!</p>
+                </div>
+
+                <!-- KHÁCH: Chỉ thấy trạng thái đang chờ chủ phòng và nút rời phòng -->
+                <div id="waitingGuestControls" class="guest-controls" style="display: none;">
+                  <div class="pulse-waiting-indicator compact">
+                    <span class="pulse-dot"></span>
+                    <span>Đang đợi chủ phòng 👑 bắt đầu trận đấu...</span>
+                  </div>
+                  <!-- Nút rời phòng dành riêng cho khách -->
+                  <button id="leaveRoomBtn" class="btn btn-leave-room" title="Rời khỏi phòng">
+                    <span>🚪 Rời phòng</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cột phải: Danh sách người chơi hiển thị cân đối, không scroll -->
+            <div class="waiting-col-right">
+              <div class="waiting-players-section compact">
+                <div class="section-title-row">
+                  <div class="title-with-icon">
+                    <span class="section-icon">👥</span>
+                    <span class="section-title">Danh sách người chơi</span>
+                  </div>
+                  <div class="player-count-badge-group" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="room-mode-badge" id="waitingRoomModeBadge" title="Chế độ chơi">🎨 Luân Phiên</span>
+                    <span class="player-count-badge"><span id="waitingPlayerCount">1</span>/<span id="waitingMaxPlayerCount">8</span> người</span>
+                  </div>
+                </div>
+                <div class="waiting-players-grid compact" id="waitingPlayersGrid">
+                  <!-- Render danh sách thẻ người chơi theo thời gian thực -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Screen: Room Settings Modal (Cài đặt phòng chơi: Chế độ chơi, Thời gian vẽ, Số người tối đa) -->
+    <div id="settingsScreen" class="screen-modal">
+      <div class="settings-modal-card">
+        <!-- Settings Header -->
+        <div class="settings-header">
+          <div class="settings-title-group">
+            <span class="settings-header-icon">⚙️</span>
+            <div>
+              <h2 class="settings-title">Cài Đặt Phòng Chơi</h2>
+              <p class="settings-subtitle">Tùy chỉnh thể thức và quy tắc dành cho chủ phòng 👑</p>
+            </div>
+          </div>
+          <button id="closeSettingsBtn" class="modal-close-btn" title="Đóng" aria-label="Đóng cài đặt">✕</button>
+        </div>
+
+        <!-- Settings Body -->
+        <div class="settings-body">
+          <!-- 1. CHỌN CHẾ ĐỘ CHƠI -->
+          <div class="setting-group">
+            <label class="setting-label">
+              <span class="label-icon">🎮</span>
+              <span class="label-text">Chế độ chơi</span>
+            </label>
+            <div class="mode-select-grid" id="modeSelectGrid">
+              <div class="mode-select-card active" data-mode="turn-based">
+                <div class="mode-card-header">
+                  <span class="mode-card-icon">🎨</span>
+                  <span class="mode-card-badge">Mặc định</span>
+                </div>
+                <div class="mode-card-title">Luân Phiên Cổ Điển</div>
+                <p class="mode-card-desc">Lần lượt từng người vẽ, các người chơi còn lại đua đoán từ khóa để nhận điểm thưởng.</p>
+              </div>
+
+              <div class="mode-select-card disabled" data-mode="speed-1v1" title="Chế độ chơi này hiện đang bị khóa (Sắp ra mắt)">
+                <div class="mode-card-header">
+                  <span class="mode-card-icon">⚡</span>
+                  <span class="mode-card-badge">🔒 Sắp ra mắt</span>
+                </div>
+                <div class="mode-card-title">Đấu Tốc Độ 1v1</div>
+                <p class="mode-card-desc">Đối đầu so tài tốc độ vẽ và đoán phản xạ cực nhanh trong thời gian ngắn nhất.</p>
+              </div>
+
+              <div class="mode-select-card disabled" data-mode="relay" title="Chế độ chơi này hiện đang bị khóa (Sắp ra mắt)">
+                <div class="mode-card-header">
+                  <span class="mode-card-icon">🤝</span>
+                  <span class="mode-card-badge">🔒 Sắp ra mắt</span>
+                </div>
+                <div class="mode-card-title">Vẽ Tiếp Sức</div>
+                <p class="mode-card-desc">Cùng một bức tranh, mỗi người vẽ tiếp một phần để đồng đội giải mã thông điệp.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. THỜI GIAN VẼ MỖI LƯỢT -->
+          <div class="setting-group">
+            <div class="setting-label-row">
+              <label class="setting-label">
+                <span class="label-icon">⏱️</span>
+                <span class="label-text">Thời gian vẽ mỗi lượt</span>
+              </label>
+              <span class="setting-current-val" id="drawTimeDisplay">60 giây</span>
+            </div>
+            <div class="pill-selector-row draw-time-row" id="drawTimeSelector">
+              <button type="button" class="pill-option" data-time="30">30s <small>(Nhanh)</small></button>
+              <button type="button" class="pill-option active" data-time="60">60s <small>(Chuẩn)</small></button>
+              <button type="button" class="pill-option" data-time="80">80s <small>(Vừa)</small></button>
+              <button type="button" class="pill-option" data-time="100">100s <small>(Thư thả)</small></button>
+              <button type="button" class="pill-option" data-time="120">120s <small>(Kỹ)</small></button>
+              <button type="button" class="pill-option pill-other" id="pillOtherDrawTime" data-time="other">
+                <span>Khác...</span>
+                <small>(Tự nhập)</small>
+              </button>
+            </div>
+
+            <!-- Ô nhập số giây đơn giản (Option Khác) -->
+            <div class="custom-time-input-box" id="customTimeBox" style="display: none;">
+              <span class="custom-time-label">Tùy chỉnh số giây:</span>
+              <div class="custom-time-field">
+                <input type="number" id="customDrawTimeInput" min="10" max="300" placeholder="Số giây (10 - 300)" class="custom-time-input">
+                <span class="input-unit">giây</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. SỐ NGƯỜI TỐI ĐA THAM GIA (DẠNG SLIDER 2 - 16 NGƯỜI) -->
+          <div class="setting-group">
+            <div class="setting-label-row">
+              <label class="setting-label">
+                <span class="label-icon">👥</span>
+                <span class="label-text">Số người tối đa tham gia</span>
+              </label>
+              <span class="setting-current-val highlight-val" id="maxPlayersDisplay">8 người</span>
+            </div>
+            <div class="slider-container">
+              <div class="slider-track-wrapper">
+                <input type="range" id="maxPlayersSlider" min="2" max="16" step="1" value="8" class="modern-range-slider">
+              </div>
+              <div class="slider-scale-labels">
+                <span class="scale-label min-label">2 người</span>
+                <span class="scale-label mid-label">8 người</span>
+                <span class="scale-label max-label">16 người</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. SỐ VÒNG ĐẤU CHO CHẾ ĐỘ LUÂN PHIÊN (3 - 6 VÒNG) -->
+          <div class="setting-group" id="roundsSettingGroup">
+            <div class="setting-label-row">
+              <label class="setting-label">
+                <span class="label-icon">🔄</span>
+                <span class="label-text">Số vòng thi đấu (Mỗi vòng ai cũng được vẽ 1 lần)</span>
+              </label>
+              <span class="setting-current-val highlight-val" id="roundsDisplay">3 vòng</span>
+            </div>
+            <div class="pill-selector-row rounds-row" id="roundsSelector">
+              <button type="button" class="pill-option active" data-rounds="3">3 vòng <small>(Chuẩn)</small></button>
+              <button type="button" class="pill-option" data-rounds="4">4 vòng <small>(Sôi nổi)</small></button>
+              <button type="button" class="pill-option" data-rounds="5">5 vòng <small>(Kịch tính)</small></button>
+              <button type="button" class="pill-option" data-rounds="6">6 vòng <small>(Đại chiến)</small></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Auto-save Notification Banner -->
+        <div class="settings-auto-hint">
+          <span class="auto-hint-icon">⚡</span>
+          <span>Thay đổi được lưu và áp dụng tự động cho cả phòng!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 3: Game Board -->
+    <div id="gameScreen" class="game-board-view">
+      <!-- Header (Topbar Hợp Nhất Toàn Diện) -->
+      <header class="game-header">
+        <div class="topbar-left">
+          <div class="brand">
+            <span class="logo-img-badge"><img src="/logo.jpg" alt="Họa Náo"></span>
+            <h1 class="logo-text">Họa Náo</h1>
+          </div>
+          <div class="room-pill">Phòng: <strong id="displayRoomCode">------</strong> <button id="copyInviteBtn" class="copy-btn" title="Sao chép link mời">📋 Copy</button></div>
+        </div>
+        
+        <div class="topbar-center">
+          <div class="timer-box" title="Thời gian còn lại">
+            <span class="timer-icon">⏱️</span>
+            <span id="timerVal">60s</span>
+          </div>
+          <div class="canvas-title round-badge" id="canvasRoundInfo">Vòng 1 / 3</div>
+          <div class="word-container">
+            <span class="word-label" id="wordStatusLabel">Từ khóa:</span>
+            <div id="secretWord" class="secret-word">_ _ _ _</div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button id="soundToggleBtn" class="action-btn icon-only-btn" title="Bật/Tắt âm thanh">
+            <span id="soundIcon">🔊</span>
+          </button>
+          <div class="status-badge" id="roleBadge">
+            <span class="dot"></span>
+            <span id="roleText">Đang đợi bắt đầu...</span>
+          </div>
+          <button id="spectatorLeaveBtn" class="btn btn-secondary btn-sm spectator-leave-btn" style="display: none;" title="Rời phòng trở về màn hình chính">
+            <span>🚪 Thoát phòng</span>
+          </button>
+          <button id="inGameLeaveBtn" class="btn btn-secondary btn-sm in-game-leave-btn" title="Thoát phòng về trang chủ">
+            <span>🚪 Thoát phòng</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Stage -->
+      <main class="main-stage">
+        <!-- Canvas Section -->
+        <section class="canvas-card">
+
+          <div class="canvas-viewport" id="canvasViewport">
+            <canvas id="paintCanvas"></canvas>
+          </div>
+
+          <!-- Drawing Toolbar -->
+          <div class="toolbar" id="toolbar">
+            <div class="tool-group color-group" id="colorPalette">
+              <button class="color-btn active" data-color="#1e1e24" style="background: #1e1e24;"></button>
+              <button class="color-btn" data-color="#ef4444" style="background: #ef4444;"></button>
+              <button class="color-btn" data-color="#f97316" style="background: #f97316;"></button>
+              <button class="color-btn" data-color="#eab308" style="background: #eab308;"></button>
+              <button class="color-btn" data-color="#22c55e" style="background: #22c55e;"></button>
+              <button class="color-btn" data-color="#06b6d4" style="background: #06b6d4;"></button>
+              <button class="color-btn" data-color="#3b82f6" style="background: #3b82f6;"></button>
+              <button class="color-btn" data-color="#a855f7" style="background: #a855f7;"></button>
+              <button class="color-btn" data-color="#ec4899" style="background: #ec4899;"></button>
+              <button class="color-btn" data-color="#ffffff" style="background: #ffffff; border: 1px solid #cbd5e1;"></button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="tool-group size-group">
+              <button class="size-btn" data-size="3"><span class="dot" style="width: 4px; height: 4px;"></span></button>
+              <button class="size-btn active" data-size="6"><span class="dot" style="width: 8px; height: 8px;"></span></button>
+              <button class="size-btn" data-size="12"><span class="dot" style="width: 14px; height: 14px;"></span></button>
+              <button class="size-btn" data-size="24"><span class="dot" style="width: 20px; height: 20px;"></span></button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="tool-group action-group">
+              <button id="eraserBtn" class="action-btn" title="Cục tẩy"><span>🧹 Tẩy</span></button>
+              <button id="clearBtn" class="action-btn danger" title="Xóa toàn bộ"><span>🗑️ Xóa hết</span></button>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Nút thả biểu cảm (1 icon button -> click mở popover nhiều icon) -->
+            <div class="reaction-popover-wrapper" id="drawerReactionWrapper">
+              <button type="button" class="action-btn reaction-trigger-btn" id="drawerReactTrigger" title="Thả biểu cảm">
+                <span class="btn-icon">🎉</span>
+              </button>
+              <div class="reaction-popover-menu" id="drawerReactMenu">
+                <button type="button" class="react-emoji-btn" data-emoji="❤️" title="Thả tim">❤️</button>
+                <button type="button" class="react-emoji-btn" data-emoji="😂" title="Cười vỡ bụng">😂</button>
+                <button type="button" class="react-emoji-btn" data-emoji="🔥" title="Đỉnh chóp">🔥</button>
+                <button type="button" class="react-emoji-btn" data-emoji="👏" title="Vỗ tay">👏</button>
+                <button type="button" class="react-emoji-btn" data-emoji="🥳" title="Tuyệt vời">🥳</button>
+                <button type="button" class="react-emoji-btn" data-emoji="❓" title="Vẽ gì thế?">❓</button>
+                <button type="button" class="react-emoji-btn" data-emoji="💩" title="Xấu quắc">💩</button>
+                <button type="button" class="react-emoji-btn" data-emoji="💯" title="100 điểm">💯</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Spectator Banner (Chỉ hiện cho khán giả) -->
+          <div class="spectator-hint-bar" id="spectatorHintBar" style="display: none;">
+            <span class="spectator-hint-text">👀 Bạn đang ở chế độ xem (Khán giả). Bạn chỉ có thể xem vẽ và chờ ván mới sau khi hết các vòng đấu để tham gia!</span>
+          </div>
+
+          <!-- Guesser Hint Bar (Chỉ hiện cho người đoán) -->
+          <div class="guesser-hint-bar" id="guesserHintBar" style="display: none;">
+            <span class="guesser-hint-text">👀 Bạn đang theo dõi nét vẽ của họa sĩ. Hãy nhập đáp án vào khung chat bên phải! 💬</span>
+            <div class="reaction-popover-wrapper" id="guesserReactionWrapper">
+              <button type="button" class="action-btn reaction-trigger-btn" id="guesserReactTrigger" title="Thả biểu cảm">
+                <span class="btn-icon">🎉</span>
+              </button>
+              <div class="reaction-popover-menu" id="guesserReactMenu">
+                <button type="button" class="react-emoji-btn" data-emoji="❤️" title="Thả tim">❤️</button>
+                <button type="button" class="react-emoji-btn" data-emoji="😂" title="Cười vỡ bụng">😂</button>
+                <button type="button" class="react-emoji-btn" data-emoji="🔥" title="Đỉnh chóp">🔥</button>
+                <button type="button" class="react-emoji-btn" data-emoji="👏" title="Vỗ tay">👏</button>
+                <button type="button" class="react-emoji-btn" data-emoji="🥳" title="Tuyệt vời">🥳</button>
+                <button type="button" class="react-emoji-btn" data-emoji="❓" title="Vẽ gì thế?">❓</button>
+                <button type="button" class="react-emoji-btn" data-emoji="💩" title="Xấu quắc">💩</button>
+                <button type="button" class="react-emoji-btn" data-emoji="💯" title="100 điểm">💯</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Sidebar: Players & Chat -->
+        <aside class="sidebar-card">
+          <div class="players-panel">
+            <div class="panel-header">Người chơi (<span id="playerCount">0</span>)</div>
+            <ul class="players-list" id="playersList"></ul>
+          </div>
+
+          <div class="chat-panel">
+            <div class="panel-header">Đoán từ trực tiếp</div>
+            <div class="chat-messages" id="chatMessages">
+              <div class="msg system">✨ Chào mừng bạn đến với Họa Náo!</div>
+            </div>
+
+            <form id="chatForm" class="chat-input-bar">
+              <input type="text" id="guessInput" placeholder="Nhập suy đoán của bạn..." autocomplete="off">
+              <button type="submit" id="sendBtn">Gửi</button>
+            </form>
+          </div>
+        </aside>
+      </main>
+    </div>
+    <!-- Modal: Bảng Xếp Hạng Kết Thúc Vòng / Tổng Kết Trận Đấu -->
+    <div id="roundLeaderboardModal" class="screen-modal">
+      <div class="leaderboard-modal-card">
+        <div class="leaderboard-modal-header">
+          <div class="trophy-badge" id="modalTrophyBadge">🏆</div>
+          <h2 class="leaderboard-modal-title" id="leaderboardModalTitle">KẾT QUẢ VÒNG 1</h2>
+          <p class="leaderboard-modal-desc" id="leaderboardModalDesc">Bảng xếp hạng tổng hợp điểm tích lũy sau vòng thi tài</p>
+        </div>
+
+        <div class="leaderboard-content-wrapper">
+          <!-- Bảng Xếp Hạng Dạng Danh Sách (List) - Người cao điểm nhất ở đầu tiên -->
+          <div class="leaderboard-list" id="leaderboardList">
+            <!-- Render động danh sách xếp hạng có animation -->
+          </div>
+        </div>
+
+        <div class="leaderboard-modal-footer">
+          <div class="countdown-badge-wrapper" id="nextRoundCountdownBox">
+            <span class="pulse-dot"></span>
+            <span id="nextRoundCountdownText">Tiếp tục sau: <strong id="nextRoundCountdownVal" class="countdown-seconds">5</strong>s</span>
+          </div>
+          <div class="game-over-actions" id="gameOverActions" style="display: none;">
+            <button id="playAgainBtn" class="btn btn-success-large">
+              <span>🚀 Bắt đầu trận mới</span>
+            </button>
+            <button id="backToWaitingBtn" class="btn btn-secondary">
+              <span>🏠 Về phòng chờ</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Global Custom Game Dialog / Popup Modal (Thay thế alert/confirm theo chuẩn phong cách game Họa Náo) -->
+    <div id="gameDialogModal" class="screen-modal game-dialog-overlay" aria-hidden="true">
+      <div class="game-dialog-card">
+        <button id="gameDialogCloseBtn" class="game-dialog-close-btn" title="Đóng" aria-label="Đóng">✕</button>
+
+        <div class="game-dialog-header">
+          <div id="gameDialogIconBadge" class="game-dialog-icon-badge info">
+            <span id="gameDialogIcon">💡</span>
+          </div>
+          <div class="game-dialog-title-group">
+            <h3 id="gameDialogTitle" class="game-dialog-title">Thông Báo</h3>
+            <span class="game-dialog-pill">Họa Náo</span>
+          </div>
+        </div>
+
+        <div class="game-dialog-body">
+          <p id="gameDialogMessage" class="game-dialog-message">Nội dung thông báo</p>
+        </div>
+
+        <div class="game-dialog-footer" id="gameDialogFooter">
+          <button id="gameDialogCancelBtn" class="btn btn-dialog-cancel" style="display: none;">Hủy bỏ</button>
+          <button id="gameDialogConfirmBtn" class="btn btn-dialog-confirm">Đã hiểu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi" class="admin-html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Họa Náo - Quản Lý Kho Từ Khóa Database</title>
+  <link rel="icon" type="image/jpeg" href="/logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/assets/admin-C8UR9DQJ.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/firebase-BgUAKcbp.js">
+  <link rel="stylesheet" crossorigin href="/assets/firebase-CaeTcMBh.css">
+  <link rel="stylesheet" crossorigin href="/assets/admin-BkufqJQ-.css">
+</head>
+<body class="admin-body">
+  <div class="admin-layout">
+    <!-- Admin Header -->
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <a href="/" class="brand-link" title="Về trang chủ trò chơi">
+          <span class="logo-img-badge"><img src="/logo.jpg" alt="Họa Náo"></span>
+          <div class="brand-text-group">
+            <h1 class="brand-name">Họa Náo</h1>
+            <span class="admin-badge">Database Manager</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="admin-header-right">
+        <a href="/" class="btn btn-secondary btn-sm back-to-game-btn">
+          <span>🎮 Về Bàn Chơi</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Admin Main Container -->
+    <main class="admin-main">
+      <!-- Quick Stats Row -->
+      <section class="stats-overview-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper icon-blue">📚</div>
+          <div class="stat-details">
+            <span class="stat-label">Tổng số từ khóa</span>
+            <strong class="stat-value" id="statTotalWords">---</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper icon-purple">🏷️</div>
+          <div class="stat-details">
+            <span class="stat-label">Danh mục thể loại</span>
+            <strong class="stat-value" id="statCategoriesCount">---</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrapper icon-green">🟢</div>
+          <div class="stat-details">
+            <span class="stat-label">Cơ sở dữ liệu</span>
+            <strong class="stat-value" style="font-size: 1.1rem; color: #34d399;">SQLite Active</strong>
+          </div>
+        </div>
+      </section>
+
+      <!-- Content Box: Management Panel -->
+      <section class="admin-panel-card">
+        <!-- Panel Controls: Search, Filters, Add Button -->
+        <div class="panel-toolbar">
+          <div class="toolbar-search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="wordSearchInput" placeholder="Tìm kiếm từ khóa (ví dụ: MÈO, XE MÁY...)" autocomplete="off">
+            <button type="button" id="clearSearchBtn" class="clear-search-btn" title="Xóa tìm kiếm" style="display: none;">✕</button>
+          </div>
+
+          <div class="toolbar-filters">
+            <!-- Category Filter -->
+            <select id="categoryFilterSelect" class="filter-select">
+              <option value="">Tất cả danh mục</option>
+            </select>
+
+            <!-- Difficulty Filter -->
+            <select id="difficultyFilterSelect" class="filter-select">
+              <option value="">Tất cả độ khó</option>
+              <option value="EASY">Dễ</option>
+              <option value="NORMAL">Bình thường</option>
+              <option value="HARD">Khó</option>
+            </select>
+
+            <!-- Add Word Button -->
+            <button id="openAddWordModalBtn" class="btn btn-primary add-word-btn">
+              <span class="btn-icon">➕</span>
+              <span>Thêm Từ Khóa</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Words Table Container -->
+        <div class="table-responsive-wrapper">
+          <table class="words-table">
+            <thead>
+              <tr>
+                <th style="width: 70px;">ID</th>
+                <th>Từ khóa</th>
+                <th style="width: 180px;">Danh mục</th>
+                <th style="width: 140px;">Độ khó</th>
+                <th style="width: 170px;">Ngày tạo</th>
+                <th style="width: 120px; text-align: right;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="wordsTableBody">
+              <tr>
+                <td colspan="6" class="table-loading-cell">
+                  <div class="loading-spinner"></div>
+                  <span>Đang tải kho từ khóa từ máy chủ...</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-bar" id="paginationBar">
+          <div class="pagination-info">
+            <span id="paginationSummaryText">Đang tải...</span>
+            <div class="limit-selector-group">
+              <label for="limitSelect">Hiển thị:</label>
+              <select id="limitSelect" class="limit-select">
+                <option value="10">10</option>
+                <option value="20" selected>20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="pagination-nav" id="paginationNav">
+            <!-- Render động các nút trang 1, 2, 3... -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal: Thêm / Sửa Từ Khóa -->
+    <div id="wordFormModal" class="screen-modal">
+      <div class="modal-card word-modal-card">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="modal-icon" id="formModalIcon">✏️</span>
+            <div>
+              <h3 class="modal-title" id="formModalTitle">Thêm Từ Khóa Mới</h3>
+              <p class="modal-subtitle">Từ khóa sẽ được lưu vào Database và lập tức áp dụng trong game</p>
+            </div>
+          </div>
+          <button id="closeFormModalBtn" class="modal-close-btn" title="Đóng">✕</button>
+        </div>
+
+        <form id="wordForm" class="modal-form">
+          <input type="hidden" id="editWordId" value="">
+
+          <!-- Trường: Từ khóa -->
+          <div class="form-group">
+            <label for="wordInput" class="form-label">
+              <span>Từ khóa</span>
+              <small class="label-hint">Tự động viết hoa, cách nhau bằng dấu cách</small>
+            </label>
+            <input type="text" id="wordInput" class="form-input" placeholder="Ví dụ: XE ĐUA F1" maxlength="35" required autocomplete="off">
+            <div class="word-preview-bar">
+              <span>Xem trước: <strong id="wordPreviewText">CHƯA NHẬP</strong></span>
+              <span class="length-tag" id="wordLengthTag">0 ký tự</span>
+            </div>
+          </div>
+
+          <!-- Trường: Danh mục / Chủ đề -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>Danh mục / Thể loại</span>
+            </label>
+            <div class="category-input-toggle">
+              <select id="formCategorySelect" class="form-input">
+                <option value="">-- Chọn danh mục có sẵn --</option>
+              </select>
+              <button type="button" id="toggleNewCategoryBtn" class="btn btn-sm btn-secondary" title="Nhập danh mục mới">
+                <span>➕ Tạo mới</span>
+              </button>
+            </div>
+            <!-- Khung nhập danh mục mới nếu không chọn có sẵn -->
+            <div id="newCategoryBox" style="display: none; margin-top: 8px;">
+              <input type="text" id="newCategoryInput" class="form-input" placeholder="Nhập tên danh mục mới (ví dụ: Vũ trụ & Không gian)..." maxlength="30">
+            </div>
+          </div>
+
+          <!-- Trường: Độ khó -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>Độ khó</span>
+            </label>
+            <div class="difficulty-pills" id="difficultyPills">
+              <button type="button" class="diff-pill" data-val="EASY">🟢 Dễ</button>
+              <button type="button" class="diff-pill active" data-val="NORMAL">🟡 Bình thường</button>
+              <button type="button" class="diff-pill" data-val="HARD">🔴 Khó</button>
+            </div>
+            <input type="hidden" id="formDifficultyVal" value="NORMAL">
+          </div>
+
+          <!-- Nút hành động -->
+          <div class="modal-actions">
+            <button type="button" id="cancelFormBtn" class="btn btn-secondary">Hủy</button>
+            <button type="submit" id="saveWordBtn" class="btn btn-primary">
+              <span id="saveBtnText">Lưu từ khóa</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal: Xác nhận Xóa Từ Khóa -->
+    <div id="deleteConfirmModal" class="screen-modal">
+      <div class="modal-card confirm-modal-card">
+        <div class="danger-icon-badge">🗑️</div>
+        <h3 class="confirm-title">Xác Nhận Xóa Từ Khóa</h3>
+        <p class="confirm-desc">
+          Bạn có chắc chắn muốn xóa từ khóa <strong id="deleteWordTargetName" style="color: #ef4444;">---</strong> khỏi cơ sở dữ liệu?
+        </p>
+        <p class="confirm-subdesc">Sau khi xóa, từ khóa này sẽ không xuất hiện trong các ván chơi nữa.</p>
+
+        <div class="modal-actions center-actions">
+          <button type="button" id="cancelDeleteBtn" class="btn btn-secondary">Hủy bỏ</button>
+          <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Xóa Vĩnh Viễn</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+  </div>
+
+</body>
+</html>
