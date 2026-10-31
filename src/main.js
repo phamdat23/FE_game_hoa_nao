@@ -359,8 +359,15 @@ document.addEventListener('click', (e) => {
   }
 });
 
+const isDev = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const defaultHttpHost = isDev ? `http://${window.location.hostname || 'localhost'}:8080` : 'https://be-game-hoa-nao.onrender.com';
+const defaultWsHost = isDev ? `ws://${window.location.hostname || 'localhost'}:8080/ws` : 'wss://be-game-hoa-nao.onrender.com/ws';
+
+const BACKEND_HTTP_URL = import.meta.env.VITE_BACKEND_URL || defaultHttpHost;
+const BACKEND_WS_URL = import.meta.env.VITE_WS_URL || defaultWsHost;
+
 async function fetchAvatarsFromServer() {
-  const apiUrl = `http://${window.location.hostname || 'localhost'}:8080/api/avatars`;
+  const apiUrl = `${BACKEND_HTTP_URL}/api/avatars`;
   try {
     const res = await fetch(apiUrl);
     if (res.ok) {
@@ -378,7 +385,7 @@ async function fetchAvatarsFromServer() {
 let socket = null;
 
 function connectSocket(onOpenCallback) {
-  const wsUrl = `ws://${window.location.hostname || 'localhost'}:8080/ws`;
+  const wsUrl = BACKEND_WS_URL;
   try {
     socket = new WebSocket(wsUrl);
 

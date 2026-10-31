@@ -24,7 +24,11 @@ async function verifyAdminAccess() {
 }
 verifyAdminAccess();
 
-const API_BASE = `http://${window.location.hostname || 'localhost'}:8080/api/words`;
+const isDev = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const defaultApiBase = isDev
+  ? `http://${window.location.hostname || 'localhost'}:8080/api/words`
+  : 'https://be-game-hoa-nao.onrender.com/api/words';
+const API_BASE = import.meta.env.VITE_API_URL || defaultApiBase;
 
 // State
 let currentPage = 1;
