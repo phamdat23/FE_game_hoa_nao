@@ -14,6 +14,7 @@ export class PaintCanvas {
 
     this.initCanvasSize();
     this.bindEvents();
+    this.setCanDraw(false);
 
     window.addEventListener('resize', () => this.handleResize());
     if (typeof ResizeObserver !== 'undefined' && this.canvas.parentElement) {
@@ -49,8 +50,10 @@ export class PaintCanvas {
     if (!this.canDraw) {
       this.isDrawing = false;
       this.canvas.style.cursor = 'default';
+      this.canvas.style.touchAction = 'pan-y';
     } else {
       this.canvas.style.cursor = 'crosshair';
+      this.canvas.style.touchAction = 'none';
     }
   }
 
@@ -89,6 +92,7 @@ export class PaintCanvas {
 
     // Touch events for mobile
     this.canvas.addEventListener('touchstart', (e) => {
+      if (!this.canDraw) return;
       e.preventDefault();
       if (e.touches.length === 1) {
         this.startDraw(this.getTouchCoords(e.touches[0]));
@@ -96,6 +100,7 @@ export class PaintCanvas {
     }, { passive: false });
 
     this.canvas.addEventListener('touchmove', (e) => {
+      if (!this.canDraw) return;
       e.preventDefault();
       if (e.touches.length === 1) {
         this.draw(this.getTouchCoords(e.touches[0]));

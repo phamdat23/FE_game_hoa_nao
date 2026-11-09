@@ -804,3 +804,57 @@ body.admin-body {
     transform: translateX(0);
   }
 }
+
+/* RESPONSIVE MOBILE CHO TRANG ADMIN */
+@media (max-width: 768px) {
+  .admin-header {
+    height: auto;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .admin-main {
+    padding: 16px 12px 32px;
+    gap: 16px;
+  }
+  .stats-overview-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .panel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .toolbar-search-box {
+    width: 100%;
+    min-width: 0;
+  }
+  .toolbar-filters {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .filter-select {
+    width: 100%;
+  }
+  .add-word-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .word-modal-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 18px 14px;
+    margin: 8px auto 24px;
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .confirm-modal-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px 16px;
+    margin: auto;
+  }
+}
