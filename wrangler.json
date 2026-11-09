@@ -2,7 +2,11 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "fe-game-hoa-nao",
   "compatibility_date": "2024-11-01",
+  "build": {
+    "command": "npm run build"
+  },
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
   }
 }
