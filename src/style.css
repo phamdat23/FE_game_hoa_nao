@@ -146,39 +146,6 @@ body {
   letter-spacing: -0.01em;
 }
 
-.room-pill {
-  background: rgba(255, 255, 255, 0.06);
-  border: var(--border-subtle);
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  font-size: 0.72rem;
-  color: var(--color-info);
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.room-pill strong {
-  letter-spacing: 1px;
-}
-
-.copy-btn {
-  background: rgba(56, 189, 248, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  border-radius: var(--radius-sm);
-  color: var(--color-info);
-  cursor: pointer;
-  font-size: 0.7rem;
-  font-weight: var(--font-weight-semibold);
-  padding: 1px 6px;
-  transition: all var(--transition-fast);
-}
-
-.copy-btn:hover {
-  background: rgba(56, 189, 248, 0.25);
-  border-color: var(--color-info);
-}
-
 .connection-status {
   font-size: 0.72rem;
   color: #a7f3d0;
@@ -2136,25 +2103,180 @@ body {
     flex: none;
   }
 
+  /* ================= TOPBAR MÀN CHƠI TỐI ƯU CHO MOBILE (GRID 2 TẦNG THÔNG MINH) ================= */
   .game-header {
+    display: grid;
+    grid-template-areas:
+      "left right"
+      "center center";
+    grid-template-columns: minmax(0, 1fr) auto;
     height: auto;
-    min-height: 40px;
-    padding: 6px 10px;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    min-height: 0;
+    padding: 6px 10px 8px;
+    gap: 6px 8px;
     position: sticky;
     top: 0;
     z-index: 40;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+  }
+
+  /* Hàng 1 - Cụm bên trái: Logo & Mã phòng */
+  .topbar-left {
+    grid-area: left;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .game-header .brand {
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .game-header .logo-img-badge {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+  }
+
+  .game-header .logo-img-badge img {
+    width: 52px;
+    height: 52px;
+    left: -14px;
+    top: -9px;
+  }
+
+  .game-header .logo-text {
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  /* Hàng 1 - Cụm bên phải: Loa, Vai trò, Nút Thoát */
+  .topbar-right {
+    grid-area: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .icon-only-btn {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    font-size: 0.78rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .status-badge {
+    padding: 2px 7px;
+    font-size: 0.68rem;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    gap: 4px;
+  }
+
+  .status-badge .dot {
+    width: 5px;
+    height: 5px;
+    flex-shrink: 0;
+  }
+
+  .in-game-leave-btn,
+  .spectator-leave-btn {
+    padding: 2px 8px;
+    font-size: 0.7rem;
+    height: 26px;
+    line-height: 1;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* Hàng 2 - Cụm trung tâm: Đồng hồ, Vòng đấu & Từ khóa chiếm 100% bề ngang */
+  .topbar-center {
+    grid-area: center;
+    width: 100%;
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    min-width: 0;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .timer-box {
+    padding: 3px 8px;
+    font-size: 0.88rem;
+    gap: 4px;
+    flex-shrink: 0;
+    background: rgba(250, 204, 21, 0.14);
+    border: 1px solid rgba(250, 204, 21, 0.4);
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.2);
+  }
+
+  .timer-box .timer-icon {
+    font-size: 0.85rem;
+  }
+
+  .round-badge {
+    padding: 3px 6px;
+    font-size: 0.68rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .word-container {
-    order: 3;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
+    padding: 3px 8px;
+    gap: 6px;
     justify-content: center;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-full);
+    background: rgba(10, 15, 29, 0.95);
+    border: 1.5px solid rgba(56, 189, 248, 0.45);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.22);
+  }
+
+  .word-label {
+    font-size: 0.65rem;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+
+  .secret-word {
+    font-size: 0.82rem;
+  }
+
+  .char-slot {
+    min-width: 14px;
+    height: 20px;
+    font-size: 0.75rem;
+  }
+
+  .char-slot.hidden-slot {
+    min-width: 14px;
+    height: 20px;
+  }
+
+  .word-space {
+    width: 6px;
   }
 
   .main-stage {
@@ -2317,6 +2439,28 @@ body {
     max-width: calc(100vw - 24px);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Tinh chỉnh bổ sung cho màn hình điện thoại siêu nhỏ (<= 420px) */
+@media (max-width: 420px) {
+  .game-header .logo-text {
+    display: none;
+  }
+  .leave-btn-text {
+    display: none;
+  }
+  .in-game-leave-btn,
+  .spectator-leave-btn {
+    padding: 2px 6px;
+    gap: 0;
+  }
+  .status-badge {
+    max-width: 85px;
+  }
+  .round-badge {
+    font-size: 0.65rem;
+    padding: 2px 4px;
   }
 }
 

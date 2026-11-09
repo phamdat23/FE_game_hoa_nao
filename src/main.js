@@ -890,7 +890,7 @@ function handleServerMessage(msg) {
     case 'room_joined':
       currentRoomCode = msg.roomCode;
       myPlayerId = msg.playerId || getTabGuestId();
-      displayRoomCode.textContent = currentRoomCode;
+      if (displayRoomCode) displayRoomCode.textContent = currentRoomCode;
       if (waitingCodeVal) waitingCodeVal.textContent = currentRoomCode;
 
       // Lưu thông tin phiên chơi vào sessionStorage của tab hiện tại

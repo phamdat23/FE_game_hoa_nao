@@ -88,7 +88,7 @@ Màn chơi được xây dựng theo tỷ lệ **80% (Bảng vẽ) - 20% (Sideba
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ TOP BAR TÍCH HỢP (.game-header)                                                                        │
-│ [Left: Logo | Mã phòng | 🟢 Ktor] [Center: ⏱️ 38s | Vòng 1/3 | Gợi ý ô từ nổi bật] [Right: 🔊 | Vai trò]│
+│ [Left: Logo thương hiệu] [Center: ⏱️ 38s | Vòng 1/3 | Gợi ý ô từ nổi bật] [Right: 🔊 | Vai trò | 🚪 Thoát]│
 ├───────────────────────────────────────────────────────────────┬────────────────────────────────────────┤
 │                                                               │ SIDEBAR (.sidebar-card)                │
 │ BẢNG VẼ (.canvas-card) - 80% CHIỀU RỘNG, 100% CHIỀU CAO        │ 20% CHIỀU RỘNG, 100% CAO               │
@@ -113,7 +113,7 @@ Màn chơi được xây dựng theo tỷ lệ **80% (Bảng vẽ) - 20% (Sideba
 
 1. **Top Bar Tinh Gọn & Nổi Bật Từ Khóa ([`.game-header`](file:///f:/project/frontend/src/style.css#L59-L135))**:
    * Thiết kế 3 phân vùng cân đối:
-     * **Cột trái (`.topbar-left`)**: Logo thương hiệu, chip mã phòng với nút sao chép link, và đèn tín hiệu kết nối WebSocket Ktor (`#wsStatus`).
+     * **Cột trái (`.topbar-left`)**: Logo thương hiệu Họa Náo tinh giản, giải phóng diện tích cho màn chơi.
      * **Cụm trung tâm (`.topbar-center`)**: Đồng hồ đếm ngược (`#timerVal`), thông tin vòng chơi (`#canvasRoundInfo`), và khu vực hiển thị từ khóa / gợi ý ô chữ (`#secretWord`) chiếm trọn tầm nhìn trung tâm với độ tương phản cao và hiệu ứng ánh sáng phát quang Neon cyan.
      * **Cột phải (`.topbar-right`)**: Nút bật/tắt âm thanh (`#soundToggleBtn`), và huy hiệu vai trò (`#roleBadge`: Họa sĩ / Người đoán).
    * **Cơ chế hiển thị từ khóa tối giản & chuẩn xác (`.word-group`, `.char-slot`, `.word-space`)**:
@@ -157,7 +157,10 @@ Hệ thống layout tự động thích ứng với mọi kích cỡ màn hình:
 | **Laptop / Tablet Ngang (769px - 1280px)** | Grid `4fr 1fr` (80% / 20%) | 100% Height, 80% Width | 100% Height, 20% Width |
 | **Mobile / Màn Hình Dọc ($\le 768px$)** | Flex Column (Xếp chồng dọc) | Height cố định 380px | Min-height 350px (dưới bảng vẽ) |
 
-### Tối ưu hiển thị cho cột 20% (Chống vỡ giao diện):
+### Tối ưu hiển thị cho cột 20% và Topbar trên Mobile (Chống vỡ giao diện):
+* **Topbar 2 tầng thông minh trên Mobile (`.game-header` với CSS Grid `grid-template-areas: "left right" "center center"`):**
+  * **Tầng 1 (Hàng phụ trên cùng):** Bên trái gồm biểu tượng Logo thương hiệu; bên phải gồm nút Bật/Tắt âm thanh 🔊, Huy hiệu vai trò (`.status-badge`: Họa sĩ / Người đoán) và nút Thoát phòng 🚪.
+  * **Tầng 2 (Hàng chính nổi bật):** Đồng hồ đếm ngược ⏱️, Vòng chơi (Vòng 1/3) và Hộp từ khóa bí mật / Ô chữ gợi ý (`.word-container`) chiếm trọn 100% bề ngang, có thể cuộn ngang nhẹ (`overflow-x: auto`) khi từ khóa dài, đảm bảo luôn hiển thị to rõ, không bị đè che khuất.
 * `.player-meta`: Sử dụng `min-width: 0;` kết hợp `white-space: nowrap; overflow: hidden; text-overflow: ellipsis;` trên `.player-name` giúp tên dài tự động thu gọn bằng dấu `...` mà không làm xô lệch điểm số.
 * `.chat-input-bar`: Input có `min-width: 0; flex: 1;`, nút Gửi có `flex-shrink: 0;` đảm bảo nút bấm không bị bóp méo trên màn hình thu nhỏ.
 
