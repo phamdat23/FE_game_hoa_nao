@@ -1,17 +1,12 @@
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
 import { defineConfig } from 'vite';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 export default defineConfig({
   base: './',
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        admin: resolve(__dirname, 'admin.html')
+        main: 'index.html',
+        admin: 'admin.html'
       }
     }
   }
