@@ -71,6 +71,25 @@ const customTimeBox = document.getElementById('customTimeBox');
 const customDrawTimeInput = document.getElementById('customDrawTimeInput');
 const roundsSelector = document.getElementById('roundsSelector');
 const roundsDisplay = document.getElementById('roundsDisplay');
+const observeTimeSettingGroup = document.getElementById('observeTimeSettingGroup');
+const observeTimeSlider = document.getElementById('observeTimeSlider');
+const observeTimeDisplay = document.getElementById('observeTimeDisplay');
+const relaySubModeSettingGroup = document.getElementById('relaySubModeSettingGroup');
+const relaySubModeSelector = document.getElementById('relaySubModeSelector');
+const relaySubModeDisplay = document.getElementById('relaySubModeDisplay');
+const drawTimeSettingGroup = document.getElementById('drawTimeSettingGroup');
+const roundsSettingGroup = document.getElementById('roundsSettingGroup');
+
+// Tiep Suc Playback Modal Elements
+const tiepSucPlaybackModal = document.getElementById('tiepSucPlaybackModal');
+const tiepSucPlaybackCanvas = document.getElementById('tiepSucPlaybackCanvas');
+const playbackStepBadge = document.getElementById('playbackStepBadge');
+const playbackArtistBadge = document.getElementById('playbackArtistBadge');
+const playbackTransitionBanner = document.getElementById('playbackTransitionBanner');
+const playbackToggleBtn = document.getElementById('playbackToggleBtn');
+const playbackReplayBtn = document.getElementById('playbackReplayBtn');
+const playbackExportBtn = document.getElementById('playbackExportBtn');
+const playbackBackToWaitingBtn = document.getElementById('playbackBackToWaitingBtn');
 
 // Leaderboard Modal Elements
 const roundLeaderboardModal = document.getElementById('roundLeaderboardModal');
@@ -90,6 +109,8 @@ const previousPlayerScores = {};
 let currentRoomSettings = {
   gameMode: 'turn-based',
   drawTime: 60,
+  observeTime: 10,
+  relaySubMode: 'free',
   maxPlayers: 8,
   maxRounds: 3,
   dedicatedDrawerId: null
@@ -106,6 +127,11 @@ const canvasRoundInfo = document.getElementById('canvasRoundInfo');
 const playerCountEl = document.getElementById('playerCount');
 const playersList = document.getElementById('playersList');
 const toolbar = document.getElementById('toolbar');
+const doneDrawingBtn = document.getElementById('doneDrawingBtn');
+const tamSaoWaitOverlay = document.getElementById('tamSaoWaitOverlay');
+const tamSaoWaitIcon = document.getElementById('tamSaoWaitIcon');
+const tamSaoWaitTitle = document.getElementById('tamSaoWaitTitle');
+const tamSaoWaitDesc = document.getElementById('tamSaoWaitDesc');
 const guesserHintBar = document.getElementById('guesserHintBar');
 const spectatorHintBar = document.getElementById('spectatorHintBar');
 const spectatorLeaveBtn = document.getElementById('spectatorLeaveBtn');
@@ -577,6 +603,63 @@ function animateScoreCountUp(elementId, startVal, endVal, onComplete) {
   leaderboardRafs.push(initialRaf);
 }
 
+function renderTamSaoResultsModal(results, isGameOver = false, titleText = '', descText = '', countdownSec = 5, countdownLabel = 'Vòng tiếp theo bắt đầu sau:') {
+  if (!roundLeaderboardModal) return;
+
+  if (roundCountdownInterval) {
+    clearInterval(roundCountdownInterval);
+    roundCountdownInterval = null;
+  }
+  clearLeaderboardTimeouts();
+
+  if (leaderboardModalTitle) leaderboardModalTitle.textContent = titleText;
+  if (leaderboardModalDesc) leaderboardModalDesc.textContent = descText;
+  if (modalTrophyBadge) modalTrophyBadge.textContent = isGameOver ? '🔄' : '✨';
+
+  if (leaderboardList) {
+    leaderboardList.innerHTML = '';
+    (results || []).forEach((r) => {
+      const row = document.createElement('div');
+      row.className = `tam-sao-result-row ${r.completed ? 'completed' : 'failed'}`;
+      const statusText = r.completed ? `✅ Hoàn thành • ${r.elapsedSeconds}s` : `❌ Thất bại • ${r.elapsedSeconds}s`;
+      row.innerHTML = `
+        <div class="tam-sao-result-info">
+          <div class="tam-sao-result-round">Vòng ${r.round} — Người đoán: <strong>${escapeHtml(r.guesserName || 'Ẩn danh')}</strong></div>
+          <div class="tam-sao-result-word">Từ khóa: ${escapeHtml(r.word || '')}</div>
+        </div>
+        <span class="tam-sao-status-pill ${r.completed ? 'success' : 'fail'}">${statusText}</span>
+      `;
+      leaderboardList.appendChild(row);
+    });
+  }
+
+  if (isGameOver) {
+    if (nextRoundCountdownBox) nextRoundCountdownBox.style.display = 'none';
+    if (gameOverActions) gameOverActions.style.display = 'flex';
+    triggerConfetti();
+    sounds.playCorrect();
+  } else {
+    if (gameOverActions) gameOverActions.style.display = 'none';
+    let remaining = countdownSec || 5;
+    if (nextRoundCountdownBox) nextRoundCountdownBox.style.display = 'flex';
+    if (nextRoundCountdownText) {
+      nextRoundCountdownText.innerHTML = `${countdownLabel} <strong id="nextRoundCountdownVal" class="countdown-seconds">${remaining}</strong>s`;
+    }
+    roundCountdownInterval = setInterval(() => {
+      remaining--;
+      const valEl = document.getElementById('nextRoundCountdownVal');
+      if (valEl) valEl.textContent = remaining;
+      if (remaining <= 0) {
+        clearInterval(roundCountdownInterval);
+        roundCountdownInterval = null;
+        closeLeaderboardModal();
+      }
+    }, 1000);
+  }
+
+  roundLeaderboardModal.classList.add('active');
+}
+
 function renderLeaderboardModal(players, isGameOver = false, titleText = '', descText = '', countdownSec = 9, countdownLabel = 'Tiếp tục sau:') {
   if (!roundLeaderboardModal) return;
 
@@ -912,13 +995,24 @@ function handleServerMessage(msg) {
       lobbyScreen.classList.remove('active');
       if (waitingRoomScreen) waitingRoomScreen.classList.add('active');
 
-      if (msg.action === 'room_created' && pendingLobbyMode) {
-        currentRoomSettings.gameMode = pendingLobbyMode;
-        if (pendingLobbyMode === 'draw-one-host') {
-          currentRoomSettings.maxPlayers = 50;
+      if (msg.action === 'room_created') {
+        isHost = true;
+        if (pendingLobbyMode) {
+          currentRoomSettings.gameMode = pendingLobbyMode;
+          if (pendingLobbyMode === 'draw-one-host') {
+            currentRoomSettings.maxPlayers = 50;
+          } else if (pendingLobbyMode === 'tam-sao-that-ban') {
+            currentRoomSettings.maxPlayers = 16;
+            currentRoomSettings.maxRounds = 3;
+            currentRoomSettings.observeTime = 10;
+          } else if (pendingLobbyMode === 'relay') {
+            currentRoomSettings.maxPlayers = 10;
+            currentRoomSettings.maxRounds = 1;
+            currentRoomSettings.relaySubMode = 'free';
+          }
+          sendRoomSettingsUpdate();
+          pendingLobbyMode = null;
         }
-        sendRoomSettingsUpdate();
-        pendingLobbyMode = null;
       }
 
       // Nếu room_info đã tới trước đó khi myPlayerId chưa gán, gọi lại để cập nhật quyền host ngay lập tức
@@ -969,8 +1063,21 @@ function handleServerMessage(msg) {
       isMyTurnToDraw = true;
       canvas.setCanDraw(true);
       if (canvasViewport) canvasViewport.classList.remove('spectating');
-      renderSecretWord(msg.word, true);
-      wordStatusLabel.textContent = 'Từ khóa:';
+      if (tamSaoWaitOverlay) tamSaoWaitOverlay.style.display = 'none';
+
+      const wordContainerEl = document.querySelector('.word-container');
+      const hasSecretWord = Boolean(msg.word && msg.word.length > 0);
+      if (wordContainerEl) {
+        wordContainerEl.style.display = hasSecretWord ? 'flex' : 'none';
+      }
+      if (hasSecretWord) {
+        renderSecretWord(msg.word, true);
+        wordStatusLabel.textContent = 'Từ khóa:';
+      } else {
+        secretWordEl.innerHTML = '';
+        wordStatusLabel.textContent = '';
+      }
+
       roleText.textContent = '🎨 BẠN ĐANG VẼ!';
       roleBadge.style.background = 'rgba(236, 72, 153, 0.2)';
       roleBadge.style.color = '#ec4899';
@@ -979,6 +1086,11 @@ function handleServerMessage(msg) {
       toolbar.classList.remove('hidden');
       toolbar.style.pointerEvents = 'auto';
       toolbar.style.opacity = '1';
+      if (doneDrawingBtn) {
+        const showDone = (currentRoomSettings.gameMode === 'tam-sao-that-ban' && !lastRoomInfo?.tamSaoIsLastDrawer)
+          || currentRoomSettings.gameMode === 'relay';
+        doneDrawingBtn.style.display = showDone ? 'inline-flex' : 'none';
+      }
       if (guesserHintBar) guesserHintBar.style.display = 'none';
 
       // Họa sĩ không được chat đoán từ của chính mình
@@ -987,10 +1099,30 @@ function handleServerMessage(msg) {
 
       // Lưu ý: Không gọi canvas.clear(false) ở đây để tránh xóa nhầm nét vẽ khi F5 reconnect
       sounds.playStart();
-      addChatMessage('Hệ thống', `Đến lượt bạn vẽ! Từ khóa là: "${msg.word}"`, true);
+      if (hasSecretWord) {
+        addChatMessage('Hệ thống', `Đến lượt bạn vẽ! Từ khóa là: "${msg.word}"`, true);
+      } else if (currentRoomSettings.gameMode === 'relay') {
+        addChatMessage('Hệ thống', '🤝 Đến lượt bạn vẽ tiếp sức! Hãy vẽ tiếp và nhấn "Xong sớm" khi hoàn thành.', true);
+      } else {
+        addChatMessage('Hệ thống', '🔄 Đến lượt bạn vẽ lại từ trí nhớ!', true);
+      }
+      break;
+
+    case 'tiep_suc_playback':
+      try {
+        const turns = typeof msg.turns === 'string' ? JSON.parse(msg.turns) : (msg.turns || []);
+        openTiepSucPlayback(turns);
+      } catch (err) {
+        console.warn('Lỗi phân tích tiep_suc_playback:', err);
+      }
       break;
 
     case 'tick':
+      if (currentRoomSettings.gameMode === 'relay' && currentRoomSettings.relaySubMode === 'free') {
+        timerVal.textContent = '∞';
+        timerVal.style.color = '#38bdf8';
+        break;
+      }
       const sec = parseInt(msg.timeLeft, 10);
       timerVal.textContent = `${sec}s`;
       if (sec <= 10 && sec > 0) {
@@ -1051,6 +1183,19 @@ function handleServerMessage(msg) {
 
     case 'round_leaderboard':
       try {
+        if (msg.type === 'tam-sao-round' && msg.tamSaoResults) {
+          const results = JSON.parse(msg.tamSaoResults);
+          renderTamSaoResultsModal(
+            results,
+            false,
+            `KẾT QUẢ VÒNG ${msg.completedRound} / ${msg.maxRounds}`,
+            'Tổng hợp trạng thái hoàn thành & thời gian vòng chơi:',
+            parseInt(msg.countdown, 10) || 5,
+            'Vòng tiếp theo bắt đầu sau:'
+          );
+          sounds.playPop();
+          break;
+        }
         const sorted = JSON.parse(msg.leaderboard);
         const isTurn = msg.type === 'turn';
         const title = isTurn 
@@ -1077,6 +1222,16 @@ function handleServerMessage(msg) {
 
     case 'game_over':
       try {
+        if (msg.tamSaoResults) {
+          const results = JSON.parse(msg.tamSaoResults);
+          renderTamSaoResultsModal(
+            results,
+            true,
+            '🔄 TỔNG KẾT TAM SAO THẤT BẢN',
+            'Kết quả hoàn thành các vòng chơi cùng cả nhóm!'
+          );
+          break;
+        }
         const sorted = JSON.parse(msg.leaderboard);
         renderLeaderboardModal(
           sorted,
@@ -1182,7 +1337,23 @@ function renderSidebarPlayersList(playersToRender) {
     const drawerTag = isDrawer ? '<span class="player-drawer-icon" title="Đang vẽ">✏️</span>' : '';
 
     const isDedicatedDrawer = currentRoomSettings.gameMode === 'draw-one-host' && p.id === currentRoomSettings.dedicatedDrawerId;
-    const scoreText = p.isSpectator ? 'Đang xem' : (isDedicatedDrawer ? '🎨 Họa sĩ' : `${scoreVal} pts`);
+    let scoreText;
+    if (currentRoomSettings.gameMode === 'tam-sao-that-ban') {
+      if (p.isSpectator) scoreText = 'Đang xem';
+      else if (lastRoomInfo?.tamSaoGuesserId === p.id) scoreText = '🔍 Người đoán';
+      else if (isDrawer) scoreText = '🎨 Đang vẽ';
+      else if (lastRoomInfo?.tamSaoObserverId === p.id) scoreText = '👀 Quan sát';
+      else scoreText = 'Họa sĩ';
+    } else if (currentRoomSettings.gameMode === 'relay') {
+      const orderIds = lastRoomInfo?.relayOrderIds || [];
+      const orderIdx = orderIds.indexOf(p.id);
+      const orderPrefix = orderIdx >= 0 ? `#${orderIdx + 1} • ` : '';
+      if (p.isSpectator) scoreText = 'Đang xem';
+      else if (isDrawer) scoreText = `${orderPrefix}🎨 Đang vẽ`;
+      else scoreText = `${orderPrefix}⏳ Đợi lượt`;
+    } else {
+      scoreText = p.isSpectator ? 'Đang xem' : (isDedicatedDrawer ? '🎨 Họa sĩ' : `${scoreVal} pts`);
+    }
 
     const li = document.createElement('li');
     li.className = `player-item ${isDrawer ? 'current-drawer' : ''} ${hasGuessed ? 'guessed-correctly' : ''} ${isYou ? 'is-you' : ''}`;
@@ -1229,6 +1400,8 @@ function updateRoomInfo(info) {
   // Cập nhật cài đặt phòng từ server
   if (info.gameMode) currentRoomSettings.gameMode = info.gameMode;
   if (info.drawTime) currentRoomSettings.drawTime = info.drawTime;
+  if (info.observeTime) currentRoomSettings.observeTime = info.observeTime;
+  if (info.relaySubMode) currentRoomSettings.relaySubMode = info.relaySubMode;
   if (info.maxPlayers) currentRoomSettings.maxPlayers = info.maxPlayers;
   if (info.maxRounds) currentRoomSettings.maxRounds = info.maxRounds;
   if (info.dedicatedDrawerId !== undefined) currentRoomSettings.dedicatedDrawerId = info.dedicatedDrawerId;
@@ -1237,6 +1410,8 @@ function updateRoomInfo(info) {
   if (waitingRoomModeBadge) {
     if (currentRoomSettings.gameMode === 'draw-one-host') {
       waitingRoomModeBadge.textContent = '🎯 Chỉ Định Họa Sĩ';
+    } else if (currentRoomSettings.gameMode === 'tam-sao-that-ban') {
+      waitingRoomModeBadge.textContent = '🔄 Tam Sao Thất Bản';
     } else if (currentRoomSettings.gameMode === 'speed-1v1') {
       waitingRoomModeBadge.textContent = '⚡ Đấu Tốc Độ 1v1';
     } else if (currentRoomSettings.gameMode === 'relay') {
@@ -1297,7 +1472,7 @@ function updateRoomInfo(info) {
             <span class="waiting-player-name">${escapeHtml(p.name || 'Người chơi')} ${p.id === myPlayerId ? '<small class="you-tag">(Bạn)</small>' : ''} ${spectatorTag}</span>
           </div>
           <div class="waiting-player-meta-row">
-            <span class="waiting-player-score-pill">${p.isSpectator ? 'Khán giả' : `${displayScore} pts`}</span>
+            <span class="waiting-player-score-pill">${p.isSpectator ? 'Khán giả' : ((currentRoomSettings.gameMode === 'tam-sao-that-ban' || currentRoomSettings.gameMode === 'relay') ? 'Sẵn sàng' : `${displayScore} pts`)}</span>
           </div>
           ${assignBtn}
         </div>
@@ -1309,13 +1484,21 @@ function updateRoomInfo(info) {
   // Kiểm tra cảnh báo số lượng người chơi trong phòng chờ
   if (playerCountWarning) {
     const isDrawOneHost = currentRoomSettings.gameMode === 'draw-one-host';
-    const minRequired = isDrawOneHost ? 3 : 2;
+    const isTamSao = currentRoomSettings.gameMode === 'tam-sao-that-ban';
+    const isRelay = currentRoomSettings.gameMode === 'relay';
+    const minRequired = (isDrawOneHost || isTamSao || isRelay) ? 3 : 2;
     const hasDedicated = info.players.some(p => p.id === (info.dedicatedDrawerId || currentRoomSettings.dedicatedDrawerId));
 
     if (info.players.length < minRequired) {
-      playerCountWarning.textContent = isDrawOneHost
-        ? 'Cần ít nhất 3 người chơi để bắt đầu chế độ Chỉ Định Họa Sĩ!'
-        : 'Cần ít nhất 2 người chơi để bắt đầu cuộc thi tài!';
+      if (isDrawOneHost) {
+        playerCountWarning.textContent = 'Cần ít nhất 3 người chơi để bắt đầu chế độ Chỉ Định Họa Sĩ!';
+      } else if (isTamSao) {
+        playerCountWarning.textContent = 'Cần ít nhất 3 người chơi để bắt đầu chế độ Tam Sao Thất Bản!';
+      } else if (isRelay) {
+        playerCountWarning.textContent = 'Cần ít nhất 3 người chơi để bắt đầu chế độ Vẽ Tiếp Sức!';
+      } else {
+        playerCountWarning.textContent = 'Cần ít nhất 2 người chơi để bắt đầu cuộc thi tài!';
+      }
       playerCountWarning.style.color = '#f87171';
       if (waitingStartGameBtn) waitingStartGameBtn.disabled = true;
       if (waitingStartGameBtn) waitingStartGameBtn.style.opacity = '0.6';
@@ -1341,8 +1524,13 @@ function updateRoomInfo(info) {
     if (waitingRoomScreen && !lobbyScreen.classList.contains('active')) {
       waitingRoomScreen.classList.add('active');
     }
+    if (tiepSucPlaybackModal) tiepSucPlaybackModal.classList.remove('active');
     roleText.textContent = 'Phòng chờ...';
     toolbar.classList.add('hidden');
+    if (doneDrawingBtn) doneDrawingBtn.style.display = 'none';
+    if (tamSaoWaitOverlay) tamSaoWaitOverlay.style.display = 'none';
+    const wordContainerWaitEl = document.querySelector('.word-container');
+    if (wordContainerWaitEl) wordContainerWaitEl.style.display = 'flex';
     if (guesserHintBar) guesserHintBar.style.display = 'none';
     canvas.setCanDraw(false);
   } else if (info.state === 'DRAWING') {
@@ -1382,35 +1570,191 @@ function updateRoomInfo(info) {
       if (spectatorLeaveBtn) spectatorLeaveBtn.style.display = 'none';
       if (sendBtn) sendBtn.disabled = false;
 
-      if (info.currentDrawerId !== myPlayerId) {
-        // Người chơi là NGƯỜI ĐOÁN (Guesser)
-        isMyTurnToDraw = false;
-        canvas.setCanDraw(false);
-        if (canvasViewport) canvasViewport.classList.add('spectating');
+      if (currentRoomSettings.gameMode === 'tam-sao-that-ban') {
+        const phase = info.tamSaoPhase;
+        const isGuesser = info.tamSaoGuesserId === myPlayerId;
+        const isObserver = info.tamSaoObserverId === myPlayerId;
+        const isCurrentDrawer = info.currentDrawerId === myPlayerId;
+        const wordContainerEl = document.querySelector('.word-container');
 
-        // Ẩn hoàn toàn bảng vẽ công cụ và hiện thanh chỉ dẫn người đoán
-        toolbar.classList.add('hidden');
-        if (guesserHintBar) guesserHintBar.style.display = 'flex';
+        if (phase === 'OBSERVING') {
+          isMyTurnToDraw = false;
+          canvas.setCanDraw(false);
+          toolbar.classList.add('hidden');
+          if (doneDrawingBtn) doneDrawingBtn.style.display = 'none';
+          if (guesserHintBar) guesserHintBar.style.display = 'none';
+          if (wordContainerEl) wordContainerEl.style.display = 'none';
+          guessInput.disabled = true;
 
-        if (myPlayer && !myPlayer.hasGuessedCorrectly) {
-          guessInput.disabled = false;
-          guessInput.placeholder = '💬 Nhập câu trả lời để đoán từ...';
+          if (isObserver) {
+            if (tamSaoWaitOverlay) tamSaoWaitOverlay.style.display = 'none';
+            if (canvasViewport) canvasViewport.classList.remove('spectating');
+            roleText.textContent = '👀 GHI NHỚ BỨC VẼ!';
+            roleBadge.style.background = 'rgba(56, 189, 248, 0.2)';
+            roleBadge.style.color = '#38bdf8';
+            guessInput.placeholder = '👀 Hãy ghi nhớ thật kỹ bức vẽ trước khi nó biến mất!';
+          } else {
+            if (canvasViewport) canvasViewport.classList.add('spectating');
+            if (tamSaoWaitOverlay) {
+              tamSaoWaitOverlay.style.display = 'flex';
+              if (tamSaoWaitIcon) tamSaoWaitIcon.textContent = '👀';
+              if (tamSaoWaitTitle) tamSaoWaitTitle.textContent = 'Đang chuyển lượt quan sát...';
+              if (tamSaoWaitDesc) tamSaoWaitDesc.textContent = 'Người vẽ tiếp theo đang quan sát bức vẽ để ghi nhớ.';
+            }
+            roleText.textContent = '⏳ Chờ quan sát...';
+            roleBadge.style.background = 'rgba(148, 163, 184, 0.2)';
+            roleBadge.style.color = '#94a3b8';
+            guessInput.placeholder = '⏳ Đang chờ người chơi tiếp theo quan sát...';
+          }
+        } else if (isCurrentDrawer) {
+          isMyTurnToDraw = true;
+          canvas.setCanDraw(true);
+          if (canvasViewport) canvasViewport.classList.remove('spectating');
+          if (tamSaoWaitOverlay) tamSaoWaitOverlay.style.display = 'none';
+          toolbar.classList.remove('hidden');
+          if (doneDrawingBtn) doneDrawingBtn.style.display = info.tamSaoIsLastDrawer ? 'none' : 'inline-flex';
+          if (guesserHintBar) guesserHintBar.style.display = 'none';
+          if (wordContainerEl) wordContainerEl.style.display = info.tamSaoIsFirstDrawer ? 'flex' : 'none';
+          roleText.textContent = info.tamSaoIsLastDrawer
+            ? '🎨 LƯỢT VẼ CUỐI (ĐOÁN TỪ)!'
+            : `🎨 BẠN ĐANG VẼ (${info.tamSaoStep}/${info.tamSaoTotalSteps})`;
+          roleBadge.style.background = 'rgba(236, 72, 153, 0.2)';
+          roleBadge.style.color = '#ec4899';
+          guessInput.disabled = true;
+          guessInput.placeholder = info.tamSaoIsLastDrawer
+            ? '🎨 Bạn là người vẽ cuối! Hãy vẽ rõ để người đoán tìm ra đáp án!'
+            : '🎨 Bạn đang vẽ! Nhấn "Xong sớm" nếu đã hoàn thành.';
+        } else if (isGuesser) {
+          isMyTurnToDraw = false;
+          canvas.setCanDraw(false);
+          if (canvasViewport) canvasViewport.classList.add('spectating');
+          toolbar.classList.add('hidden');
+          if (doneDrawingBtn) doneDrawingBtn.style.display = 'none';
+
+          if (phase === 'GUESSING') {
+            if (tamSaoWaitOverlay) tamSaoWaitOverlay.style.display = 'none';
+            if (guesserHintBar) guesserHintBar.style.display = 'flex';
+            if (wordContainerEl) wordContainerEl.style.display = 'flex';
+            if (!myPlayer || !myPlayer.hasGuessedCorrectly) {
+              renderWordHint(info.wordPattern, info.wordLength);
+              guessInput.disabled = false;
+              guessInput.placeholder = '🔍 Lượt cuối! Hãy đoán từ khóa từ bức vẽ!';
+            }
+            roleText.textContent = '🔍 ĐẾN LƯỢT BẠN ĐOÁN!';
+            roleBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+            roleBadge.style.color = '#10b981';
+          } else {
+            if (guesserHintBar) guesserHintBar.style.display = 'none';
+            if (wordContainerEl) wordContainerEl.style.display = 'none';
+            if (tamSaoWaitOverlay) {
+              tamSaoWaitOverlay.style.display = 'flex';
+              if (tamSaoWaitIcon) tamSaoWaitIcon.textContent = '🔍';
+              if (tamSaoWaitTitle) tamSaoWaitTitle.textContent = 'Bạn là Người Đoán Cuối!';
+              if (tamSaoWaitDesc) tamSaoWaitDesc.textContent = `Các họa sĩ đang truyền tay nhau bức vẽ (${info.tamSaoStep}/${info.tamSaoTotalSteps}). Bạn sẽ đoán ở lượt cuối!`;
+            }
+            guessInput.disabled = true;
+            guessInput.placeholder = '⏳ Chờ đến lượt họa sĩ cuối cùng để đoán...';
+            roleText.textContent = '🔍 Chờ lượt đoán cuối...';
+            roleBadge.style.background = 'rgba(148, 163, 184, 0.2)';
+            roleBadge.style.color = '#94a3b8';
+          }
+        } else {
+          isMyTurnToDraw = false;
+          canvas.setCanDraw(false);
+          if (canvasViewport) canvasViewport.classList.add('spectating');
+          toolbar.classList.add('hidden');
+          if (doneDrawingBtn) doneDrawingBtn.style.display = 'none';
+          if (guesserHintBar) guesserHintBar.style.display = 'none';
+          if (wordContainerEl) wordContainerEl.style.display = 'none';
+          if (tamSaoWaitOverlay) {
+            tamSaoWaitOverlay.style.display = 'flex';
+            if (tamSaoWaitIcon) tamSaoWaitIcon.textContent = '🙈';
+            if (tamSaoWaitTitle) tamSaoWaitTitle.textContent = 'Đang giữ bí mật nét vẽ!';
+            if (tamSaoWaitDesc) tamSaoWaitDesc.textContent = `${escapeHtml(info.currentDrawerName || 'Họa sĩ')} đang vẽ (${info.tamSaoStep}/${info.tamSaoTotalSteps}). Hãy chờ đến lượt quan sát của bạn!`;
+          }
+          guessInput.disabled = true;
+          guessInput.placeholder = '🙈 Chờ đến lượt của bạn...';
+          roleText.textContent = `🎨 ${info.currentDrawerName || 'Họa sĩ'} (${info.tamSaoStep}/${info.tamSaoTotalSteps})`;
+          roleBadge.style.background = 'rgba(148, 163, 184, 0.2)';
+          roleBadge.style.color = '#94a3b8';
         }
-        if (!myPlayer || !myPlayer.hasGuessedCorrectly) {
-          renderWordHint(info.wordPattern, info.wordLength);
-        }
-        roleText.textContent = `Họa sĩ: ${info.currentDrawerName || 'Bạn bè'}`;
-        roleBadge.style.background = 'rgba(16, 185, 129, 0.15)';
-        roleBadge.style.color = '#10b981';
-      } else {
-        // Người chơi là HỌA SĨ (Drawer)
-        isMyTurnToDraw = true;
-        canvas.setCanDraw(true);
-        if (canvasViewport) canvasViewport.classList.remove('spectating');
-        toolbar.classList.remove('hidden');
+      } else if (currentRoomSettings.gameMode === 'relay') {
+        const isCurrentDrawer = info.currentDrawerId === myPlayerId;
+        const wordContainerEl = document.querySelector('.word-container');
+        if (wordContainerEl) wordContainerEl.style.display = 'none';
         if (guesserHintBar) guesserHintBar.style.display = 'none';
-        guessInput.disabled = true;
-        guessInput.placeholder = '🎨 Bạn là họa sĩ, hãy vẽ hình để các bạn đoán nhé!';
+
+        if (currentRoomSettings.relaySubMode === 'free') {
+          timerVal.textContent = '∞';
+          timerVal.style.color = '#38bdf8';
+        }
+
+        if (isCurrentDrawer) {
+          isMyTurnToDraw = true;
+          canvas.setCanDraw(true);
+          if (canvasViewport) canvasViewport.classList.remove('spectating');
+          if (tamSaoWaitOverlay) tamSaoWaitOverlay.style.display = 'none';
+          toolbar.classList.remove('hidden');
+          if (doneDrawingBtn) doneDrawingBtn.style.display = 'inline-flex';
+          roleText.textContent = `🤝 LƯỢT CỦA BẠN (${info.relayStep}/${info.relayTotalSteps})`;
+          roleBadge.style.background = 'rgba(236, 72, 153, 0.2)';
+          roleBadge.style.color = '#ec4899';
+          guessInput.disabled = true;
+          guessInput.placeholder = '🎨 Vẽ tiếp sức và bấm "Xong sớm" khi hoàn thành lượt của bạn!';
+        } else {
+          isMyTurnToDraw = false;
+          canvas.setCanDraw(false);
+          if (canvasViewport) canvasViewport.classList.add('spectating');
+          toolbar.classList.add('hidden');
+          if (doneDrawingBtn) doneDrawingBtn.style.display = 'none';
+          if (tamSaoWaitOverlay) {
+            tamSaoWaitOverlay.style.display = 'flex';
+            if (tamSaoWaitIcon) tamSaoWaitIcon.textContent = '🤝';
+            if (tamSaoWaitTitle) tamSaoWaitTitle.textContent = 'Đang giữ bí mật nét vẽ!';
+            if (tamSaoWaitDesc) tamSaoWaitDesc.textContent = `${escapeHtml(info.currentDrawerName || 'Họa sĩ')} đang vẽ tiếp sức (${info.relayStep}/${info.relayTotalSteps}). Chỉ người kế tiếp mới được xem khi hoàn thành!`;
+          }
+          guessInput.disabled = false;
+          guessInput.placeholder = '💬 Trò chuyện trong khi chờ đến lượt vẽ của bạn...';
+          roleText.textContent = `🤝 ${info.currentDrawerName || 'Họa sĩ'} (${info.relayStep}/${info.relayTotalSteps})`;
+          roleBadge.style.background = 'rgba(56, 189, 248, 0.2)';
+          roleBadge.style.color = '#38bdf8';
+        }
+      } else {
+        if (tamSaoWaitOverlay) tamSaoWaitOverlay.style.display = 'none';
+        if (doneDrawingBtn) doneDrawingBtn.style.display = 'none';
+        const wordContainerDefaultEl = document.querySelector('.word-container');
+        if (wordContainerDefaultEl) wordContainerDefaultEl.style.display = 'flex';
+
+        if (info.currentDrawerId !== myPlayerId) {
+          // Người chơi là NGƯỜI ĐOÁN (Guesser)
+          isMyTurnToDraw = false;
+          canvas.setCanDraw(false);
+          if (canvasViewport) canvasViewport.classList.add('spectating');
+
+          // Ẩn hoàn toàn bảng vẽ công cụ và hiện thanh chỉ dẫn người đoán
+          toolbar.classList.add('hidden');
+          if (guesserHintBar) guesserHintBar.style.display = 'flex';
+
+          if (myPlayer && !myPlayer.hasGuessedCorrectly) {
+            guessInput.disabled = false;
+            guessInput.placeholder = '💬 Nhập câu trả lời để đoán từ...';
+          }
+          if (!myPlayer || !myPlayer.hasGuessedCorrectly) {
+            renderWordHint(info.wordPattern, info.wordLength);
+          }
+          roleText.textContent = `Họa sĩ: ${info.currentDrawerName || 'Bạn bè'}`;
+          roleBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+          roleBadge.style.color = '#10b981';
+        } else {
+          // Người chơi là HỌA SĨ (Drawer)
+          isMyTurnToDraw = true;
+          canvas.setCanDraw(true);
+          if (canvasViewport) canvasViewport.classList.remove('spectating');
+          toolbar.classList.remove('hidden');
+          if (guesserHintBar) guesserHintBar.style.display = 'none';
+          guessInput.disabled = true;
+          guessInput.placeholder = '🎨 Bạn là họa sĩ, hãy vẽ hình để các bạn đoán nhé!';
+        }
       }
     }
   }
@@ -1579,6 +1923,10 @@ const playTurnBasedBtn = document.getElementById('playTurnBasedBtn');
 const modeTurnBased = document.getElementById('modeTurnBased');
 const playDrawOneHostBtn = document.getElementById('playDrawOneHostBtn');
 const modeDrawOneHost = document.getElementById('modeDrawOneHost');
+const playTamSaoThatBanBtn = document.getElementById('playTamSaoThatBanBtn');
+const modeTamSaoThatBan = document.getElementById('modeTamSaoThatBan');
+const playRelayBtn = document.getElementById('playRelayBtn');
+const modeRelay = document.getElementById('modeRelay');
 
 function handleCreateRoom() {
   const name = nicknameInput.value.trim() || 'Họa Sĩ';
@@ -1587,7 +1935,8 @@ function handleCreateRoom() {
     action: 'create_room',
     playerId: getTabGuestId(),
     playerName: name,
-    playerAvatar: avatar
+    playerAvatar: avatar,
+    gameMode: pendingLobbyMode || 'turn-based'
   });
 }
 
@@ -1611,6 +1960,22 @@ if (playDrawOneHostBtn) {
   });
 }
 
+if (playTamSaoThatBanBtn) {
+  playTamSaoThatBanBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    pendingLobbyMode = 'tam-sao-that-ban';
+    handleCreateRoom();
+  });
+}
+
+if (playRelayBtn) {
+  playRelayBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    pendingLobbyMode = 'relay';
+    handleCreateRoom();
+  });
+}
+
 if (modeTurnBased) {
   modeTurnBased.addEventListener('click', () => {
     pendingLobbyMode = 'turn-based';
@@ -1624,6 +1989,22 @@ if (modeDrawOneHost) {
     pendingLobbyMode = 'draw-one-host';
     document.querySelectorAll('.game-mode-card').forEach(c => c.classList.remove('selected'));
     modeDrawOneHost.classList.add('selected');
+  });
+}
+
+if (modeTamSaoThatBan) {
+  modeTamSaoThatBan.addEventListener('click', () => {
+    pendingLobbyMode = 'tam-sao-that-ban';
+    document.querySelectorAll('.game-mode-card').forEach(c => c.classList.remove('selected'));
+    modeTamSaoThatBan.classList.add('selected');
+  });
+}
+
+if (modeRelay) {
+  modeRelay.addEventListener('click', () => {
+    pendingLobbyMode = 'relay';
+    document.querySelectorAll('.game-mode-card').forEach(c => c.classList.remove('selected'));
+    modeRelay.classList.add('selected');
   });
 }
 
@@ -1734,6 +2115,8 @@ function sendRoomSettingsUpdate() {
     action: 'update_settings',
     gameMode: currentRoomSettings.gameMode,
     drawTime: currentRoomSettings.drawTime,
+    observeTime: currentRoomSettings.observeTime,
+    relaySubMode: currentRoomSettings.relaySubMode,
     maxPlayers: currentRoomSettings.maxPlayers,
     maxRounds: currentRoomSettings.maxRounds
   });
@@ -1837,11 +2220,13 @@ function renderSettingsUI() {
     }
   }
 
-  // 3. Cập nhật chọn số người tối đa (Slider 2 - 16 người hoặc 3 - 50 người cho draw-one-host)
+  // 3. Cập nhật chọn số người tối đa (Slider 2 - 16 người, 3 - 50 cho draw-one-host, 3 - 16 cho tam-sao-that-ban, 3 - 10 cho relay)
   const isDrawOneHost = currentRoomSettings.gameMode === 'draw-one-host';
+  const isTamSao = currentRoomSettings.gameMode === 'tam-sao-that-ban';
+  const isRelay = currentRoomSettings.gameMode === 'relay';
   if (maxPlayersSlider) {
-    maxPlayersSlider.min = isDrawOneHost ? 3 : 2;
-    maxPlayersSlider.max = isDrawOneHost ? 50 : 16;
+    maxPlayersSlider.min = (isDrawOneHost || isTamSao || isRelay) ? 3 : 2;
+    maxPlayersSlider.max = isDrawOneHost ? 50 : (isRelay ? 10 : 16);
     maxPlayersSlider.value = currentRoomSettings.maxPlayers;
   }
   if (maxPlayersDisplay) {
@@ -1852,9 +2237,43 @@ function renderSettingsUI() {
     const minLabel = scaleLabels.querySelector('.min-label');
     const midLabel = scaleLabels.querySelector('.mid-label');
     const maxLabel = scaleLabels.querySelector('.max-label');
-    if (minLabel) minLabel.textContent = isDrawOneHost ? '3 người' : '2 người';
-    if (midLabel) midLabel.textContent = isDrawOneHost ? '25 người' : '8 người';
-    if (maxLabel) maxLabel.textContent = isDrawOneHost ? '50 người' : '16 người';
+    if (minLabel) minLabel.textContent = (isDrawOneHost || isTamSao || isRelay) ? '3 người' : '2 người';
+    if (midLabel) midLabel.textContent = isDrawOneHost ? '25 người' : (isRelay ? '6 người' : (isTamSao ? '9 người' : '8 người'));
+    if (maxLabel) maxLabel.textContent = isDrawOneHost ? '50 người' : (isRelay ? '10 người' : '16 người');
+  }
+
+  // 3b. Thời gian quan sát (chỉ hiện cho chế độ Tam Sao Thất Bản)
+  if (observeTimeSettingGroup) {
+    observeTimeSettingGroup.style.display = isTamSao ? 'block' : 'none';
+  }
+  if (observeTimeSlider) {
+    observeTimeSlider.value = currentRoomSettings.observeTime || 10;
+  }
+  if (observeTimeDisplay) {
+    observeTimeDisplay.textContent = `${currentRoomSettings.observeTime || 10} giây`;
+  }
+
+  // 3c. Kiểu chơi Vẽ Tiếp Sức (Tự do / Giới hạn giờ) & Ẩn/hiện Thời gian vẽ + Số vòng
+  if (relaySubModeSettingGroup) {
+    relaySubModeSettingGroup.style.display = isRelay ? 'block' : 'none';
+  }
+  if (relaySubModeSelector) {
+    relaySubModeSelector.querySelectorAll('.pill-option').forEach(btn => {
+      if (btn.dataset.relayMode === (currentRoomSettings.relaySubMode || 'free')) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+  if (relaySubModeDisplay) {
+    relaySubModeDisplay.textContent = currentRoomSettings.relaySubMode === 'timed' ? 'Giới hạn thời gian' : 'Tự do';
+  }
+  if (drawTimeSettingGroup) {
+    drawTimeSettingGroup.style.display = (!isRelay || currentRoomSettings.relaySubMode === 'timed') ? 'block' : 'none';
+  }
+  if (roundsSettingGroup) {
+    roundsSettingGroup.style.display = isRelay ? 'none' : 'block';
   }
 
   // 4. Cập nhật chọn số vòng thi đấu (3 - 6 vòng)
@@ -1911,9 +2330,32 @@ modeSelectGrid?.addEventListener('click', (e) => {
       if (currentRoomSettings.maxPlayers <= 16 && currentRoomSettings.maxPlayers === 8) {
         currentRoomSettings.maxPlayers = 20;
       }
+    } else if (newMode === 'tam-sao-that-ban') {
+      if (currentRoomSettings.maxPlayers < 3) currentRoomSettings.maxPlayers = 3;
+      if (currentRoomSettings.maxPlayers > 16) currentRoomSettings.maxPlayers = 16;
+      if (currentRoomSettings.maxRounds < 3) currentRoomSettings.maxRounds = 3;
+      if (currentRoomSettings.maxRounds > 6) currentRoomSettings.maxRounds = 6;
+    } else if (newMode === 'relay') {
+      if (currentRoomSettings.maxPlayers < 3) currentRoomSettings.maxPlayers = 3;
+      if (currentRoomSettings.maxPlayers > 10) currentRoomSettings.maxPlayers = 10;
+      currentRoomSettings.maxRounds = 1;
     } else if (newMode === 'turn-based') {
       if (currentRoomSettings.maxPlayers > 16) currentRoomSettings.maxPlayers = 8;
     }
+    renderSettingsUI();
+    sendRoomSettingsUpdate();
+    sounds.playPop();
+  }
+});
+
+// Bắt sự kiện chọn kiểu chơi Vẽ Tiếp Sức (Tự do / Giới hạn giờ)
+relaySubModeSelector?.addEventListener('click', (e) => {
+  if (!isHost) return;
+  const btn = e.target.closest('.pill-option');
+  if (!btn) return;
+  const modeVal = btn.dataset.relayMode;
+  if (modeVal && modeVal !== currentRoomSettings.relaySubMode) {
+    currentRoomSettings.relaySubMode = modeVal;
     renderSettingsUI();
     sendRoomSettingsUpdate();
     sounds.playPop();
@@ -1981,6 +2423,30 @@ customDrawTimeInput?.addEventListener('input', () => {
 
 customDrawTimeInput?.addEventListener('change', () => {
   handleCustomTimeInput(true);
+});
+
+observeTimeSlider?.addEventListener('input', () => {
+  const val = parseInt(observeTimeSlider.value, 10);
+  if (observeTimeDisplay && !isNaN(val)) {
+    observeTimeDisplay.textContent = `${val} giây`;
+  }
+});
+
+observeTimeSlider?.addEventListener('change', () => {
+  if (!isHost) return;
+  const val = parseInt(observeTimeSlider.value, 10);
+  if (!isNaN(val) && val >= 5 && val <= 15 && val !== currentRoomSettings.observeTime) {
+    currentRoomSettings.observeTime = val;
+    renderSettingsUI();
+    sendRoomSettingsUpdate();
+    sounds.playPop();
+  }
+});
+
+doneDrawingBtn?.addEventListener('click', () => {
+  if (!isMyTurnToDraw && lastRoomInfo?.currentDrawerId !== myPlayerId) return;
+  sendToServer({ action: 'finish_drawing' });
+  sounds.playPop();
 });
 
 customDrawTimeInput?.addEventListener('blur', () => {
@@ -2225,3 +2691,196 @@ document.addEventListener('touchstart', (e) => {
     e.preventDefault();
   }
 }, { passive: false });
+
+// ================= VẼ TIẾP SỨC: PLAYBACK ANIMATION & VIDEO EXPORT =================
+let relayPlaybackTurns = [];
+let relayPlaybackRaf = null;
+let relayPlaybackPaused = false;
+let relayPlaybackTimer = null;
+let relayIsExporting = false;
+
+function stopTiepSucPlayback() {
+  if (relayPlaybackRaf) {
+    cancelAnimationFrame(relayPlaybackRaf);
+    relayPlaybackRaf = null;
+  }
+  if (relayPlaybackTimer) {
+    clearTimeout(relayPlaybackTimer);
+    relayPlaybackTimer = null;
+  }
+  relayPlaybackPaused = false;
+}
+
+function drawPlaybackHeaderOnCanvas(ctx, step, total, artistLabel) {
+  ctx.save();
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+  ctx.fillRect(0, 0, 800, 40);
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = 'bold 16px sans-serif';
+  ctx.fillText(`Lượt ${step}/${total}`, 16, 26);
+  ctx.fillStyle = '#f8fafc';
+  ctx.font = 'bold 16px sans-serif';
+  ctx.fillText(artistLabel, 115, 26);
+  ctx.restore();
+}
+
+function drawStrokeSegmentOnCtx(ctx, rawStroke, w, h) {
+  const parsed = typeof rawStroke === 'string' ? JSON.parse(rawStroke) : rawStroke;
+  const s = (parsed && parsed.payload) ? parsed.payload : parsed;
+  if (!s || typeof s.x0 !== 'number' || typeof s.y0 !== 'number') return;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(s.x0 * w, s.y0 * h);
+  ctx.lineTo(s.x1 * w, s.y1 * h);
+  ctx.strokeStyle = s.color || '#1e1e24';
+  ctx.lineWidth = s.size || 6;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+  ctx.restore();
+}
+
+function runTiepSucPlaybackSequence(onComplete = null) {
+  stopTiepSucPlayback();
+  if (!tiepSucPlaybackCanvas || !relayPlaybackTurns.length) {
+    if (onComplete) onComplete();
+    return;
+  }
+
+  const ctx = tiepSucPlaybackCanvas.getContext('2d');
+  const W = tiepSucPlaybackCanvas.width;
+  const H = tiepSucPlaybackCanvas.height;
+  const total = relayPlaybackTurns.length;
+
+  if (playbackTransitionBanner) playbackTransitionBanner.style.display = 'none';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  function playTurn(idx) {
+    if (idx >= total) {
+      if (playbackToggleBtn) playbackToggleBtn.textContent = '▶️ Đã xong';
+      if (onComplete) onComplete();
+      return;
+    }
+
+    const turn = relayPlaybackTurns[idx];
+    const strokes = Array.isArray(turn.strokes) ? turn.strokes : [];
+    if (strokes.length === 0) {
+      relayPlaybackTimer = setTimeout(() => playTurn(idx + 1), 300);
+      return;
+    }
+
+    let sIdx = 0;
+    const stepPerFrame = Math.max(1, Math.ceil(strokes.length / 80));
+
+    function animateStrokes() {
+      if (relayPlaybackPaused) {
+        relayPlaybackRaf = requestAnimationFrame(animateStrokes);
+        return;
+      }
+      const end = Math.min(strokes.length, sIdx + stepPerFrame);
+      for (; sIdx < end; sIdx++) {
+        drawStrokeSegmentOnCtx(ctx, strokes[sIdx], W, H);
+      }
+
+      if (sIdx < strokes.length) {
+        relayPlaybackRaf = requestAnimationFrame(animateStrokes);
+      } else {
+        relayPlaybackTimer = setTimeout(() => playTurn(idx + 1), 350);
+      }
+    }
+
+    relayPlaybackRaf = requestAnimationFrame(animateStrokes);
+  }
+
+  if (playbackToggleBtn) playbackToggleBtn.textContent = '⏸️ Tạm dừng';
+  playTurn(0);
+}
+
+function openTiepSucPlayback(turns) {
+  relayPlaybackTurns = Array.isArray(turns) ? turns : [];
+  if (!tiepSucPlaybackModal) return;
+
+  if (playbackBackToWaitingBtn) playbackBackToWaitingBtn.style.display = 'inline-flex';
+  if (playbackExportBtn) {
+    playbackExportBtn.disabled = false;
+    playbackExportBtn.textContent = '🎬 Tải Video';
+  }
+
+  tiepSucPlaybackModal.classList.add('active');
+  runTiepSucPlaybackSequence();
+}
+
+function exportTiepSucVideo() {
+  if (!tiepSucPlaybackCanvas || relayIsExporting || !relayPlaybackTurns.length) return;
+  if (typeof tiepSucPlaybackCanvas.captureStream !== 'function' || typeof MediaRecorder === 'undefined') {
+    showCustomAlert({
+      title: 'Trình duyệt không hỗ trợ',
+      message: 'Trình duyệt hiện tại không hỗ trợ quay video từ Canvas (MediaRecorder).',
+      type: 'warning',
+      icon: '🎬'
+    });
+    return;
+  }
+
+  relayIsExporting = true;
+  if (playbackExportBtn) {
+    playbackExportBtn.disabled = true;
+    playbackExportBtn.textContent = '⏳ Đang xuất video...';
+  }
+
+  const stream = tiepSucPlaybackCanvas.captureStream(30);
+  const mimeCandidates = ['video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+  const selectedMime = mimeCandidates.find(m => MediaRecorder.isTypeSupported(m)) || '';
+  const recorder = selectedMime ? new MediaRecorder(stream, { mimeType: selectedMime }) : new MediaRecorder(stream);
+  const chunks = [];
+
+  recorder.ondataavailable = (e) => {
+    if (e.data && e.data.size > 0) chunks.push(e.data);
+  };
+
+  recorder.onstop = () => {
+    const ext = selectedMime.includes('mp4') ? 'mp4' : 'webm';
+    const blob = new Blob(chunks, { type: selectedMime || 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ve-tiep-suc-${currentRoomCode || 'hoa-nao'}.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+    relayIsExporting = false;
+    if (playbackExportBtn) {
+      playbackExportBtn.disabled = false;
+      playbackExportBtn.textContent = '🎬 Tải Video';
+    }
+  };
+
+  recorder.start(100);
+  runTiepSucPlaybackSequence(() => {
+    setTimeout(() => {
+      if (recorder.state !== 'inactive') recorder.stop();
+    }, 400);
+  });
+}
+
+playbackToggleBtn?.addEventListener('click', () => {
+  relayPlaybackPaused = !relayPlaybackPaused;
+  playbackToggleBtn.textContent = relayPlaybackPaused ? '▶️ Tiếp tục' : '⏸️ Tạm dừng';
+});
+
+playbackReplayBtn?.addEventListener('click', () => {
+  runTiepSucPlaybackSequence();
+});
+
+playbackExportBtn?.addEventListener('click', () => {
+  exportTiepSucVideo();
+});
+
+playbackBackToWaitingBtn?.addEventListener('click', () => {
+  stopTiepSucPlayback();
+  if (tiepSucPlaybackModal) tiepSucPlaybackModal.classList.remove('active');
+  if (waitingRoomScreen) waitingRoomScreen.classList.add('active');
+});

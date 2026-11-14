@@ -10,9 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="./assets/main-CuoWb-4z.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/firebase-CK5KmsZx.js">
-  <link rel="stylesheet" crossorigin href="./assets/firebase-Csv1RgjV.css">
+  <script type="module" crossorigin src="./assets/main-BDVVo6r5.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/firebase-DQqm4RTd.js">
+  <link rel="stylesheet" crossorigin href="./assets/firebase-B4l1Z5Sj.css">
 </head>
 <body>
   <div id="app" class="game-container">
@@ -149,6 +149,44 @@
             </div>
           </div>
 
+          <!-- Chế độ 3: Tam Sao Thất Bản (Mới mở) -->
+          <div class="game-mode-card" data-mode="tam-sao-that-ban" id="modeTamSaoThatBan">
+            <div class="card-status-badge badge-active">
+              <span class="pulse-indicator-dot"></span>
+              <span>Mới mở 🌟</span>
+            </div>
+            <div class="mode-icon-circle">🔄</div>
+            <div class="mode-content">
+              <div class="mode-header-row">
+                <h3 class="mode-name">Tam Sao Thất Bản</h3>
+                <span class="mode-tag mode-tag-highlight">Giải trí</span>
+              </div>
+              <p class="mode-desc">
+                Truyền tin qua nét vẽ! Người đầu vẽ từ khóa, các bạn sau nhìn tranh trong vài giây rồi vẽ lại cho người cuối đoán!
+              </p>
+              <div class="mode-features-list">
+                <div class="feature-item">
+                  <span class="feature-icon">👥</span>
+                  <span>3 – 16 người chơi</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">🔄</span>
+                  <span>3 – 6 vòng</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">👀</span>
+                  <span>Quan sát 5s – 15s</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-action-bar">
+              <button class="btn btn-primary btn-play-mode" id="playTamSaoThatBanBtn">
+                <span>Vào chơi</span>
+                <span class="arrow-icon">➔</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Chế độ 2: Đấu Nhanh (Sắp ra mắt) -->
           <div class="game-mode-card disabled" data-mode="speed-run">
             <div class="card-status-badge badge-upcoming">
@@ -185,38 +223,40 @@
             </div>
           </div>
 
-          <!-- Chế độ 3: Đại Chiến Tiếp Sức (Sắp ra mắt) -->
-          <div class="game-mode-card disabled" data-mode="relay">
-            <div class="card-status-badge badge-upcoming">
-              <span>Sắp ra mắt</span>
+          <!-- Chế độ 4: Vẽ Tiếp Sức (Mới mở) -->
+          <div class="game-mode-card" data-mode="relay" id="modeRelay">
+            <div class="card-status-badge badge-active">
+              <span class="pulse-indicator-dot"></span>
+              <span>Mới mở 🌟</span>
             </div>
             <div class="mode-icon-circle">🤝</div>
             <div class="mode-content">
               <div class="mode-header-row">
                 <h3 class="mode-name">Vẽ Tiếp Sức</h3>
-                <span class="mode-tag">Đồng đội</span>
+                <span class="mode-tag mode-tag-highlight">Giải trí</span>
               </div>
               <p class="mode-desc">
-                Nối tiếp nét vẽ trên cùng bức tranh bí ẩn cùng đồng đội, giải mã nhanh hơn đối phương để chiến thắng!
+                Vẽ tiếp nối theo vòng tròn! Chỉ thấy bức vẽ của người ngay trước đó và phát lại toàn bộ hành trình khi kết thúc.
               </p>
               <div class="mode-features-list">
                 <div class="feature-item">
-                  <span class="feature-icon">🤝</span>
-                  <span>Team 2v2 / 3v3</span>
+                  <span class="feature-icon">👥</span>
+                  <span>3 – 10 người chơi</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">🧩</span>
-                  <span>Ghép tranh tiếp sức</span>
+                  <span class="feature-icon">🎬</span>
+                  <span>Phát lại & Xuất Video</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">🎉</span>
-                  <span>Phối hợp ăn ý</span>
+                  <span class="feature-icon">🕊️</span>
+                  <span>Tự do / Giới hạn giờ</span>
                 </div>
               </div>
             </div>
             <div class="card-action-bar">
-              <button class="btn btn-secondary btn-play-mode" disabled>
-                <span>Chưa mở</span>
+              <button class="btn btn-primary btn-play-mode" id="playRelayBtn">
+                <span>Vào chơi</span>
+                <span class="arrow-icon">➔</span>
               </button>
             </div>
           </div>
@@ -380,6 +420,15 @@
                 <p class="mode-card-desc">1 người vẽ suốt trận do Host chỉ định. Tối đa 50 người chơi, cộng tối đa 50đ/lượt.</p>
               </div>
 
+              <div class="mode-select-card" data-mode="tam-sao-that-ban">
+                <div class="mode-card-header">
+                  <span class="mode-card-icon">🔄</span>
+                  <span class="mode-card-badge">Mới</span>
+                </div>
+                <div class="mode-card-title">Tam Sao Thất Bản</div>
+                <p class="mode-card-desc">Truyền tin qua nét vẽ theo chuỗi 3–16 người, không xếp hạng, tính tổng thời gian đoán mỗi vòng.</p>
+              </div>
+
               <div class="mode-select-card disabled" data-mode="speed-1v1" title="Chế độ chơi này hiện đang bị khóa (Sắp ra mắt)">
                 <div class="mode-card-header">
                   <span class="mode-card-icon">⚡</span>
@@ -389,19 +438,34 @@
                 <p class="mode-card-desc">Đối đầu so tài tốc độ vẽ và đoán phản xạ cực nhanh trong thời gian ngắn nhất.</p>
               </div>
 
-              <div class="mode-select-card disabled" data-mode="relay" title="Chế độ chơi này hiện đang bị khóa (Sắp ra mắt)">
+              <div class="mode-select-card" data-mode="relay">
                 <div class="mode-card-header">
                   <span class="mode-card-icon">🤝</span>
-                  <span class="mode-card-badge">🔒 Sắp ra mắt</span>
+                  <span class="mode-card-badge">Mới</span>
                 </div>
                 <div class="mode-card-title">Vẽ Tiếp Sức</div>
-                <p class="mode-card-desc">Cùng một bức tranh, mỗi người vẽ tiếp một phần để đồng đội giải mã thông điệp.</p>
+                <p class="mode-card-desc">3–10 người vẽ nối tiếp theo vòng tròn, chỉ thấy nét của người ngay trước và phát lại video cuối ván.</p>
               </div>
             </div>
           </div>
 
+          <!-- 1b. CHẾ ĐỘ CON CHO VẼ TIẾP SỨC (TỰ DO / GIỚI HẠN THỜI GIAN) -->
+          <div class="setting-group" id="relaySubModeSettingGroup" style="display: none;">
+            <div class="setting-label-row">
+              <label class="setting-label">
+                <span class="label-icon">🎛️</span>
+                <span class="label-text">Kiểu chơi Vẽ Tiếp Sức</span>
+              </label>
+              <span class="setting-current-val highlight-val" id="relaySubModeDisplay">Tự do</span>
+            </div>
+            <div class="pill-selector-row" id="relaySubModeSelector">
+              <button type="button" class="pill-option active" data-relay-mode="free">🕊️ Tự do <small>(Bấm xong)</small></button>
+              <button type="button" class="pill-option" data-relay-mode="timed">⏱️ Giới hạn giờ <small>(Tự chuyển)</small></button>
+            </div>
+          </div>
+
           <!-- 2. THỜI GIAN VẼ MỖI LƯỢT -->
-          <div class="setting-group">
+          <div class="setting-group" id="drawTimeSettingGroup">
             <div class="setting-label-row">
               <label class="setting-label">
                 <span class="label-icon">⏱️</span>
@@ -468,6 +532,27 @@
               <button type="button" class="pill-option" data-rounds="6">6 vòng <small>(Đại chiến)</small></button>
             </div>
           </div>
+
+          <!-- 5. THỜI GIAN QUAN SÁT TRANH CHO TAM SAO THẤT BẢN (5s - 15s) -->
+          <div class="setting-group" id="observeTimeSettingGroup" style="display: none;">
+            <div class="setting-label-row">
+              <label class="setting-label">
+                <span class="label-icon">👀</span>
+                <span class="label-text">Thời gian nhìn bức vẽ trước khi biến mất</span>
+              </label>
+              <span class="setting-current-val highlight-val" id="observeTimeDisplay">10 giây</span>
+            </div>
+            <div class="slider-container">
+              <div class="slider-track-wrapper">
+                <input type="range" id="observeTimeSlider" min="5" max="15" step="1" value="10" class="modern-range-slider">
+              </div>
+              <div class="slider-scale-labels">
+                <span class="scale-label">5 giây (Chớp nhoáng)</span>
+                <span class="scale-label">10 giây</span>
+                <span class="scale-label">15 giây (Thư thả)</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Settings Auto-save Notification Banner -->
@@ -525,6 +610,13 @@
 
           <div class="canvas-viewport" id="canvasViewport">
             <canvas id="paintCanvas"></canvas>
+            <div class="tam-sao-wait-overlay" id="tamSaoWaitOverlay" style="display: none;">
+              <div class="tam-sao-wait-card">
+                <div class="tam-sao-wait-icon" id="tamSaoWaitIcon">🎨</div>
+                <h3 class="tam-sao-wait-title" id="tamSaoWaitTitle">Đang truyền tin qua nét vẽ...</h3>
+                <p class="tam-sao-wait-desc" id="tamSaoWaitDesc">Hãy chờ đến lượt quan sát bức vẽ của bạn nhé!</p>
+              </div>
+            </div>
           </div>
 
           <!-- Drawing Toolbar -->
@@ -556,6 +648,7 @@
             <div class="tool-group action-group">
               <button id="eraserBtn" class="action-btn" title="Cục tẩy"><span>🧹 Tẩy</span></button>
               <button id="clearBtn" class="action-btn danger" title="Xóa toàn bộ"><span>🗑️ Xóa hết</span></button>
+              <button id="doneDrawingBtn" class="action-btn done-early-btn" style="display: none;" title="Hoàn thành lượt vẽ sớm"><span>✅ Xong sớm</span></button>
             </div>
 
             <div class="divider"></div>
@@ -653,6 +746,39 @@
             <button id="backToWaitingBtn" class="btn btn-secondary">
               <span>🏠 Về phòng chờ</span>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Phát lại & Xuất Video Vẽ Tiếp Sức -->
+    <div id="tiepSucPlaybackModal" class="screen-modal">
+      <div class="playback-modal-card">
+        <div class="playback-modal-header">
+          <div>
+            <h2 class="playback-modal-title">🎬 HÀNH TRÌNH VẼ TIẾP SỨC</h2>
+            <p class="playback-modal-desc" id="playbackModalDesc">Xem lại toàn bộ tác phẩm nối tiếp từ lượt đầu đến lượt cuối</p>
+          </div>
+        </div>
+
+        <div class="playback-hud" style="display: none;">
+          <span class="playback-pill" id="playbackStepBadge"></span>
+          <span class="playback-artist-pill" id="playbackArtistBadge"></span>
+        </div>
+
+        <div class="playback-stage">
+          <canvas id="tiepSucPlaybackCanvas" width="800" height="520"></canvas>
+          <div id="playbackTransitionBanner" class="playback-transition-banner" style="display: none;"></div>
+        </div>
+
+        <div class="playback-controls">
+          <div class="playback-btn-group">
+            <button id="playbackToggleBtn" class="btn btn-secondary playback-ctrl-btn">⏸️ Tạm dừng</button>
+            <button id="playbackReplayBtn" class="btn btn-secondary playback-ctrl-btn">🔄 Phát lại</button>
+            <button id="playbackExportBtn" class="btn playback-export-btn">🎬 Tải Video</button>
+          </div>
+          <div class="playback-btn-group">
+            <button id="playbackBackToWaitingBtn" class="btn btn-secondary">🏠 Về phòng chờ</button>
           </div>
         </div>
       </div>
