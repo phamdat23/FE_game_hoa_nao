@@ -4426,3 +4426,49 @@ body {
   cursor: wait;
   transform: none;
 }
+
+/* ================= CYBER-POP SVG ICON SYSTEM ================= */
+.ui-icon {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.15em;
+  flex-shrink: 0;
+  color: currentColor;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.25));
+}
+
+.mode-svg-icon {
+  width: 30px;
+  height: 30px;
+  display: block;
+  color: #38bdf8;
+  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.45));
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.game-mode-card:hover .mode-svg-icon,
+.game-mode-card.selected .mode-svg-icon {
+  color: #f472b6;
+  filter: drop-shadow(0 0 12px rgba(244, 114, 182, 0.55));
+  transform: scale(1.08);
+}
+
+.btn-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  line-height: 1;
+}
+
+.feature-icon .ui-icon {
+  width: 15px;
+  height: 15px;
+  color: #38bdf8;
+}
+
+.btn-settings-icon .ui-icon {
+  width: 20px;
+  height: 20px;
+}

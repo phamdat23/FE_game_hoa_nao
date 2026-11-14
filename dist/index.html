@@ -10,11 +10,94 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="./assets/main-BDVVo6r5.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/firebase-DQqm4RTd.js">
-  <link rel="stylesheet" crossorigin href="./assets/firebase-B4l1Z5Sj.css">
+  <script type="module" crossorigin src="./assets/main-CmOZtsNv.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/firebase-C-8ha_X9.js">
+  <link rel="stylesheet" crossorigin href="./assets/firebase-7X-9eDrM.css">
 </head>
 <body>
+  <!-- Cyber-Pop SVG Icon Sprite -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;" aria-hidden="true">
+    <symbol id="icon-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2a10 10 0 0 0-1 19.95c1.3.13 2-.88 2-1.95 0-.5-.2-.96-.5-1.3-.32-.36-.5-.83-.5-1.35A2 2 0 0 1 14 15.35h2.3A5.7 5.7 0 0 0 22 9.65C22 5.4 17.52 2 12 2Z"/>
+      <circle cx="7.5" cy="10.5" r="1" fill="currentColor"/><circle cx="10.5" cy="7.5" r="1" fill="currentColor"/><circle cx="15" cy="8.5" r="1" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-repeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>
+    </symbol>
+    <symbol id="icon-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </symbol>
+    <symbol id="icon-relay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+    </symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>
+    </symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </symbol>
+    <symbol id="icon-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+      <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+    </symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>
+    </symbol>
+    <symbol id="icon-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="5" width="14" height="14" rx="2"/><polygon points="22 7 16 12 22 17 22 7"/>
+    </symbol>
+    <symbol id="icon-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/>
+      <line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>
+      <line x1="2" y1="14" x2="6" y2="14"/><line x1="10" y1="8" x2="14" y2="8"/><line x1="18" y1="16" x2="22" y2="16"/>
+    </symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+    </symbol>
+    <symbol id="icon-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+    </symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    </symbol>
+    <symbol id="icon-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09Z"/>
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2Z"/>
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+    </symbol>
+    <symbol id="icon-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+    </symbol>
+    <symbol id="icon-eraser" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/>
+    </symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </symbol>
+    <symbol id="icon-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/>
+    </symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24" fill="currentColor">
+      <polygon points="6 4 20 12 6 20 6 4"/>
+    </symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24" fill="currentColor">
+      <rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>
+    </symbol>
+    <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+    </symbol>
+  </svg>
   <div id="app" class="game-container">
     <!-- Screen 1: Home / Lobby Page -->
     <div id="lobbyScreen" class="home-screen active">
@@ -79,7 +162,7 @@
               <span class="pulse-indicator-dot"></span>
               <span>Đang áp dụng</span>
             </div>
-            <div class="mode-icon-circle rotate-effect">🎨</div>
+            <div class="mode-icon-circle rotate-effect"><svg class="mode-svg-icon"><use href="#icon-palette"/></svg></div>
             <div class="mode-content">
               <div class="mode-header-row">
                 <h3 class="mode-name">Luân Phiên Cổ Điển</h3>
@@ -90,15 +173,15 @@
               </p>
               <div class="mode-features-list">
                 <div class="feature-item">
-                  <span class="feature-icon">⏱️</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-clock"/></svg></span>
                   <span>Vẽ 60s / lượt</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">👥</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-users"/></svg></span>
                   <span>2 – 16 người chơi</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">🏆</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-trophy"/></svg></span>
                   <span>Đua top điểm số</span>
                 </div>
               </div>
@@ -117,7 +200,7 @@
               <span class="pulse-indicator-dot"></span>
               <span>Mới mở 🌟</span>
             </div>
-            <div class="mode-icon-circle">🎯</div>
+            <div class="mode-icon-circle"><svg class="mode-svg-icon"><use href="#icon-target"/></svg></div>
             <div class="mode-content">
               <div class="mode-header-row">
                 <h3 class="mode-name">Chỉ Định Họa Sĩ</h3>
@@ -128,15 +211,15 @@
               </p>
               <div class="mode-features-list">
                 <div class="feature-item">
-                  <span class="feature-icon">🖌️</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-palette"/></svg></span>
                   <span>1 người vẽ suốt trận</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">👥</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-users"/></svg></span>
                   <span>3 – 50 người chơi</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">⚡</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-bolt"/></svg></span>
                   <span>Tối đa 50đ / lượt</span>
                 </div>
               </div>
@@ -155,7 +238,7 @@
               <span class="pulse-indicator-dot"></span>
               <span>Mới mở 🌟</span>
             </div>
-            <div class="mode-icon-circle">🔄</div>
+            <div class="mode-icon-circle"><svg class="mode-svg-icon"><use href="#icon-repeat"/></svg></div>
             <div class="mode-content">
               <div class="mode-header-row">
                 <h3 class="mode-name">Tam Sao Thất Bản</h3>
@@ -166,15 +249,15 @@
               </p>
               <div class="mode-features-list">
                 <div class="feature-item">
-                  <span class="feature-icon">👥</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-users"/></svg></span>
                   <span>3 – 16 người chơi</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">🔄</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-repeat"/></svg></span>
                   <span>3 – 6 vòng</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">👀</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-eye"/></svg></span>
                   <span>Quan sát 5s – 15s</span>
                 </div>
               </div>
@@ -192,7 +275,7 @@
             <div class="card-status-badge badge-upcoming">
               <span>Sắp ra mắt</span>
             </div>
-            <div class="mode-icon-circle">⚡</div>
+            <div class="mode-icon-circle"><svg class="mode-svg-icon"><use href="#icon-bolt"/></svg></div>
             <div class="mode-content">
               <div class="mode-header-row">
                 <h3 class="mode-name">Đấu Tốc Độ 1v1</h3>
@@ -203,15 +286,15 @@
               </p>
               <div class="mode-features-list">
                 <div class="feature-item">
-                  <span class="feature-icon">⚡</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-bolt"/></svg></span>
                   <span>Vòng đấu 30s</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">🥊</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-target"/></svg></span>
                   <span>Solo 1v1 gay cấn</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">🔥</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-sparkle"/></svg></span>
                   <span>Căng não phản xạ</span>
                 </div>
               </div>
@@ -229,7 +312,7 @@
               <span class="pulse-indicator-dot"></span>
               <span>Mới mở 🌟</span>
             </div>
-            <div class="mode-icon-circle">🤝</div>
+            <div class="mode-icon-circle"><svg class="mode-svg-icon"><use href="#icon-relay"/></svg></div>
             <div class="mode-content">
               <div class="mode-header-row">
                 <h3 class="mode-name">Vẽ Tiếp Sức</h3>
@@ -240,15 +323,15 @@
               </p>
               <div class="mode-features-list">
                 <div class="feature-item">
-                  <span class="feature-icon">👥</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-users"/></svg></span>
                   <span>3 – 10 người chơi</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">🎬</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-video"/></svg></span>
                   <span>Phát lại & Xuất Video</span>
                 </div>
                 <div class="feature-item">
-                  <span class="feature-icon">🕊️</span>
+                  <span class="feature-icon"><svg class="ui-icon"><use href="#icon-sliders"/></svg></span>
                   <span>Tự do / Giới hạn giờ</span>
                 </div>
               </div>
@@ -265,7 +348,7 @@
 
       <!-- Nút Kho Từ Khóa xếp gọn tại góc màn hình sảnh (Mặc định ẩn, kiểm tra quyền truy cập qua Firebase Remote Config ip_config) -->
       <a href="./admin.html" class="corner-wordbank-btn" id="cornerWordBankBtn" title="Quản lý kho từ khóa Database" style="display: none;">
-        <span class="btn-icon">📚</span>
+        <span class="btn-icon"><svg class="ui-icon"><use href="#icon-book"/></svg></span>
         <span class="btn-text">Kho Từ Khóa</span>
       </a>
     </div>
@@ -293,10 +376,10 @@
           <!-- CÁC NÚT DÀNH RIÊNG CHO CHỦ PHÒNG (Chủ phòng mới có Cài đặt và Thoát phòng) -->
           <div id="hostTopbarActions" class="host-topbar-actions" style="display: none;">
             <button id="roomSettingsBtn" class="btn-icon-circle btn-settings-icon" title="Cài đặt phòng chơi (Chủ phòng)" aria-label="Cài đặt">
-              <span class="btn-icon-glyph">⚙️</span>
+              <span class="btn-icon-glyph"><svg class="ui-icon"><use href="#icon-gear"/></svg></span>
             </button>
             <button id="closeWaitingRoomBtn" class="btn btn-exit-room" title="Thoát phòng về trang chủ">
-              <span class="exit-glyph">✕</span>
+              <span class="exit-glyph"><svg class="ui-icon"><use href="#icon-logout"/></svg></span>
               <span>Thoát phòng</span>
             </button>
           </div>
@@ -314,7 +397,7 @@
                 <div class="code-row">
                   <span class="code-digits" id="waitingCodeVal">------</span>
                   <button id="copyCodeBtn" class="btn btn-copy" title="Sao chép mã phòng">
-                    <span>📋 Copy</span>
+                    <span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-copy"/></svg> Copy</span>
                   </button>
                 </div>
                 <p class="copy-success-hint" id="copySuccessHint" style="display: none;">Đã sao chép vào bộ nhớ tạm! 🎉</p>
@@ -325,7 +408,7 @@
                 <!-- CHỈ CHỦ PHÒNG MỚI CÓ NÚT BẮT ĐẦU -->
                 <div id="waitingHostControls" class="host-controls">
                   <button id="waitingStartGameBtn" class="btn btn-success-large">
-                    <span>🚀 Bắt đầu trận đấu</span>
+                    <span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-rocket"/></svg> Bắt đầu trận đấu</span>
                   </button>
                   <p class="waiting-hint" id="playerCountWarning">Cần ít nhất 2 người chơi để bắt đầu cuộc thi tài!</p>
                 </div>
@@ -334,11 +417,11 @@
                 <div id="waitingGuestControls" class="guest-controls" style="display: none;">
                   <div class="pulse-waiting-indicator compact">
                     <span class="pulse-dot"></span>
-                    <span>Đang đợi chủ phòng 👑 bắt đầu trận đấu...</span>
+                    <span>Đang đợi chủ phòng bắt đầu trận đấu...</span>
                   </div>
                   <!-- Nút rời phòng dành riêng cho khách -->
                   <button id="leaveRoomBtn" class="btn btn-leave-room" title="Rời khỏi phòng">
-                    <span>🚪 Rời phòng</span>
+                    <span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-logout"/></svg> Rời phòng</span>
                   </button>
                 </div>
               </div>
@@ -595,10 +678,10 @@
             <span id="roleText">Đang đợi bắt đầu...</span>
           </div>
           <button id="spectatorLeaveBtn" class="btn btn-secondary btn-sm spectator-leave-btn" style="display: none;" title="Rời phòng trở về màn hình chính">
-            <span>🚪 <span class="leave-btn-text">Thoát phòng</span></span>
+            <span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-logout"/></svg> <span class="leave-btn-text">Thoát phòng</span></span>
           </button>
           <button id="inGameLeaveBtn" class="btn btn-secondary btn-sm in-game-leave-btn" title="Thoát phòng về trang chủ">
-            <span>🚪 <span class="leave-btn-text">Thoát phòng</span></span>
+            <span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-logout"/></svg> <span class="leave-btn-text">Thoát phòng</span></span>
           </button>
         </div>
       </header>
@@ -646,9 +729,9 @@
             <div class="divider"></div>
 
             <div class="tool-group action-group">
-              <button id="eraserBtn" class="action-btn" title="Cục tẩy"><span>🧹 Tẩy</span></button>
-              <button id="clearBtn" class="action-btn danger" title="Xóa toàn bộ"><span>🗑️ Xóa hết</span></button>
-              <button id="doneDrawingBtn" class="action-btn done-early-btn" style="display: none;" title="Hoàn thành lượt vẽ sớm"><span>✅ Xong sớm</span></button>
+              <button id="eraserBtn" class="action-btn" title="Cục tẩy"><span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-eraser"/></svg> Tẩy</span></button>
+              <button id="clearBtn" class="action-btn danger" title="Xóa toàn bộ"><span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-trash"/></svg> Xóa hết</span></button>
+              <button id="doneDrawingBtn" class="action-btn done-early-btn" style="display: none;" title="Hoàn thành lượt vẽ sớm"><span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-check"/></svg> Xong sớm</span></button>
             </div>
 
             <div class="divider"></div>
@@ -656,7 +739,7 @@
             <!-- Nút thả biểu cảm (1 icon button -> click mở popover nhiều icon) -->
             <div class="reaction-popover-wrapper" id="drawerReactionWrapper">
               <button type="button" class="action-btn reaction-trigger-btn" id="drawerReactTrigger" title="Thả biểu cảm">
-                <span class="btn-icon">🎉</span>
+                <span class="btn-icon"><svg class="ui-icon"><use href="#icon-sparkle"/></svg></span>
               </button>
               <div class="reaction-popover-menu" id="drawerReactMenu">
                 <button type="button" class="react-emoji-btn" data-emoji="❤️" title="Thả tim">❤️</button>
@@ -773,12 +856,12 @@
 
         <div class="playback-controls">
           <div class="playback-btn-group">
-            <button id="playbackToggleBtn" class="btn btn-secondary playback-ctrl-btn">⏸️ Tạm dừng</button>
-            <button id="playbackReplayBtn" class="btn btn-secondary playback-ctrl-btn">🔄 Phát lại</button>
-            <button id="playbackExportBtn" class="btn playback-export-btn">🎬 Tải Video</button>
+            <button id="playbackToggleBtn" class="btn btn-secondary playback-ctrl-btn"><span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-pause"/></svg> Tạm dừng</span></button>
+            <button id="playbackReplayBtn" class="btn btn-secondary playback-ctrl-btn"><span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-repeat"/></svg> Phát lại</span></button>
+            <button id="playbackExportBtn" class="btn playback-export-btn"><span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-video"/></svg> Tải Video</span></button>
           </div>
           <div class="playback-btn-group">
-            <button id="playbackBackToWaitingBtn" class="btn btn-secondary">🏠 Về phòng chờ</button>
+            <button id="playbackBackToWaitingBtn" class="btn btn-secondary playback-ctrl-btn"><span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-home"/></svg> Về phòng chờ</span></button>
           </div>
         </div>
       </div>

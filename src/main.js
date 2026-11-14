@@ -2758,7 +2758,7 @@ function runTiepSucPlaybackSequence(onComplete = null) {
 
   function playTurn(idx) {
     if (idx >= total) {
-      if (playbackToggleBtn) playbackToggleBtn.textContent = '▶️ Đã xong';
+      if (playbackToggleBtn) playbackToggleBtn.innerHTML = '<span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-play"/></svg> Đã xong</span>';
       if (onComplete) onComplete();
       return;
     }
@@ -2793,7 +2793,7 @@ function runTiepSucPlaybackSequence(onComplete = null) {
     relayPlaybackRaf = requestAnimationFrame(animateStrokes);
   }
 
-  if (playbackToggleBtn) playbackToggleBtn.textContent = '⏸️ Tạm dừng';
+  if (playbackToggleBtn) playbackToggleBtn.innerHTML = '<span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-pause"/></svg> Tạm dừng</span>';
   playTurn(0);
 }
 
@@ -2804,7 +2804,7 @@ function openTiepSucPlayback(turns) {
   if (playbackBackToWaitingBtn) playbackBackToWaitingBtn.style.display = 'inline-flex';
   if (playbackExportBtn) {
     playbackExportBtn.disabled = false;
-    playbackExportBtn.textContent = '🎬 Tải Video';
+    playbackExportBtn.innerHTML = '<span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-video"/></svg> Tải Video</span>';
   }
 
   tiepSucPlaybackModal.classList.add('active');
@@ -2854,7 +2854,7 @@ function exportTiepSucVideo() {
     relayIsExporting = false;
     if (playbackExportBtn) {
       playbackExportBtn.disabled = false;
-      playbackExportBtn.textContent = '🎬 Tải Video';
+      playbackExportBtn.innerHTML = '<span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-video"/></svg> Tải Video</span>';
     }
   };
 
@@ -2868,7 +2868,9 @@ function exportTiepSucVideo() {
 
 playbackToggleBtn?.addEventListener('click', () => {
   relayPlaybackPaused = !relayPlaybackPaused;
-  playbackToggleBtn.textContent = relayPlaybackPaused ? '▶️ Tiếp tục' : '⏸️ Tạm dừng';
+  playbackToggleBtn.innerHTML = relayPlaybackPaused
+    ? '<span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-play"/></svg> Tiếp tục</span>'
+    : '<span class="btn-with-icon"><svg class="ui-icon"><use href="#icon-pause"/></svg> Tạm dừng</span>';
 });
 
 playbackReplayBtn?.addEventListener('click', () => {
