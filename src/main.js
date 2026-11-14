@@ -52,6 +52,11 @@ const hostTopbarActions = document.getElementById('hostTopbarActions');
 const roomSettingsBtn = document.getElementById('roomSettingsBtn');
 const waitingStartGameBtn = document.getElementById('waitingStartGameBtn');
 const playerCountWarning = document.getElementById('playerCountWarning');
+const dedicatedDrawerBanner = document.getElementById('dedicatedDrawerBanner');
+const dedicatedDrawerAvatar = document.getElementById('dedicatedDrawerAvatar');
+const dedicatedDrawerNameText = document.getElementById('dedicatedDrawerNameText');
+const dedicatedDrawerTag = document.getElementById('dedicatedDrawerTag');
+let pendingLobbyMode = null;
 
 // Settings Modal Elements
 const settingsScreen = document.getElementById('settingsScreen');
@@ -86,7 +91,8 @@ let currentRoomSettings = {
   gameMode: 'turn-based',
   drawTime: 60,
   maxPlayers: 8,
-  maxRounds: 3
+  maxRounds: 3,
+  dedicatedDrawerId: null
 };
 let draftRoomSettings = { ...currentRoomSettings };
 
@@ -906,6 +912,15 @@ function handleServerMessage(msg) {
       lobbyScreen.classList.remove('active');
       if (waitingRoomScreen) waitingRoomScreen.classList.add('active');
 
+      if (msg.action === 'room_created' && pendingLobbyMode) {
+        currentRoomSettings.gameMode = pendingLobbyMode;
+        if (pendingLobbyMode === 'draw-one-host') {
+          currentRoomSettings.maxPlayers = 50;
+        }
+        sendRoomSettingsUpdate();
+        pendingLobbyMode = null;
+      }
+
       // Nếu room_info đã tới trước đó khi myPlayerId chưa gán, gọi lại để cập nhật quyền host ngay lập tức
       if (lastRoomInfo) {
         updateRoomInfo(lastRoomInfo);
@@ -987,7 +1002,7 @@ function handleServerMessage(msg) {
       break;
 
     case 'correct_guess':
-      addChatMessage('Hệ thống', `🎉 ${msg.playerAvatar || '✨'} ${msg.playerName} đã đoán chính xác (+${msg.points} pts)!`, true);
+      addChatMessage('Hệ thống', `🎉 ${msg.playerAvatar || '✨'} ${msg.playerName} đã đoán đúng!`, true);
       sounds.playCorrect();
       triggerConfetti();
       break;
@@ -1166,6 +1181,9 @@ function renderSidebarPlayersList(playersToRender) {
     const guessedTag = (!p.isSpectator && !isDrawer && hasGuessed) ? '<span class="player-guessed-tag" title="Đã đoán trúng">✓</span>' : '';
     const drawerTag = isDrawer ? '<span class="player-drawer-icon" title="Đang vẽ">✏️</span>' : '';
 
+    const isDedicatedDrawer = currentRoomSettings.gameMode === 'draw-one-host' && p.id === currentRoomSettings.dedicatedDrawerId;
+    const scoreText = p.isSpectator ? 'Đang xem' : (isDedicatedDrawer ? '🎨 Họa sĩ' : `${scoreVal} pts`);
+
     const li = document.createElement('li');
     li.className = `player-item ${isDrawer ? 'current-drawer' : ''} ${hasGuessed ? 'guessed-correctly' : ''} ${isYou ? 'is-you' : ''}`;
     li.innerHTML = `
@@ -1179,7 +1197,7 @@ function renderSidebarPlayersList(playersToRender) {
           ${drawerTag}
           ${guessedTag}
         </span>
-        <span class="player-score">${p.isSpectator ? 'Đang xem' : `${scoreVal} pts`}</span>
+        <span class="player-score">${scoreText}</span>
       </div>
     `;
     playersList.appendChild(li);
@@ -1187,24 +1205,66 @@ function renderSidebarPlayersList(playersToRender) {
 }
 
 function updateRoomInfo(info) {
+  // Cập nhật vai trò Host của người chơi hiện tại ngay từ đầu hàm để mọi thành phần UI đồng bộ
+  const me = info.players ? info.players.find(p => p.id === myPlayerId) : null;
+  if (me) {
+    isHost = !!me.isHost;
+  }
+
   canvasRoundInfo.textContent = `Vòng ${info.round} / ${info.maxRounds}`;
   playerCountEl.textContent = info.players.length;
   if (waitingPlayerCount) waitingPlayerCount.textContent = info.players.length;
+
+  // Cập nhật hiển thị điều khiển theo quyền Host / Khách
+  if (isHost) {
+    if (waitingHostControls) waitingHostControls.style.display = 'block';
+    if (waitingGuestControls) waitingGuestControls.style.display = 'none';
+    if (hostTopbarActions) hostTopbarActions.style.display = 'flex';
+  } else {
+    if (waitingHostControls) waitingHostControls.style.display = 'none';
+    if (waitingGuestControls) waitingGuestControls.style.display = 'block';
+    if (hostTopbarActions) hostTopbarActions.style.display = 'none';
+  }
 
   // Cập nhật cài đặt phòng từ server
   if (info.gameMode) currentRoomSettings.gameMode = info.gameMode;
   if (info.drawTime) currentRoomSettings.drawTime = info.drawTime;
   if (info.maxPlayers) currentRoomSettings.maxPlayers = info.maxPlayers;
   if (info.maxRounds) currentRoomSettings.maxRounds = info.maxRounds;
+  if (info.dedicatedDrawerId !== undefined) currentRoomSettings.dedicatedDrawerId = info.dedicatedDrawerId;
 
   if (waitingMaxPlayerCount) waitingMaxPlayerCount.textContent = currentRoomSettings.maxPlayers;
   if (waitingRoomModeBadge) {
-    if (currentRoomSettings.gameMode === 'speed-1v1') {
+    if (currentRoomSettings.gameMode === 'draw-one-host') {
+      waitingRoomModeBadge.textContent = '🎯 Chỉ Định Họa Sĩ';
+    } else if (currentRoomSettings.gameMode === 'speed-1v1') {
       waitingRoomModeBadge.textContent = '⚡ Đấu Tốc Độ 1v1';
     } else if (currentRoomSettings.gameMode === 'relay') {
       waitingRoomModeBadge.textContent = '🤝 Vẽ Tiếp Sức';
     } else {
       waitingRoomModeBadge.textContent = '🎨 Luân Phiên';
+    }
+  }
+
+  // Cập nhật Banner Họa Sĩ Chỉ Định trong phòng chờ
+  if (dedicatedDrawerBanner) {
+    if (currentRoomSettings.gameMode === 'draw-one-host') {
+      dedicatedDrawerBanner.style.display = 'flex';
+      const drawerPlayer = info.players.find(p => p.id === (info.dedicatedDrawerId || currentRoomSettings.dedicatedDrawerId));
+      if (drawerPlayer) {
+        if (dedicatedDrawerAvatar) dedicatedDrawerAvatar.textContent = drawerPlayer.avatar || '🎨';
+        if (dedicatedDrawerNameText) {
+          const isYou = drawerPlayer.id === myPlayerId ? ' <small class="you-tag">(Bạn)</small>' : '';
+          dedicatedDrawerNameText.innerHTML = `${escapeHtml(drawerPlayer.name || 'Họa Sĩ')}${isYou}`;
+        }
+      } else {
+        if (dedicatedDrawerAvatar) dedicatedDrawerAvatar.textContent = '❓';
+        if (dedicatedDrawerNameText) {
+          dedicatedDrawerNameText.textContent = isHost ? 'Chưa chỉ định (Nhấn "Chọn vẽ" bên dưới)' : 'Đang đợi chủ phòng chỉ định...';
+        }
+      }
+    } else {
+      dedicatedDrawerBanner.style.display = 'none';
     }
   }
 
@@ -1217,47 +1277,57 @@ function updateRoomInfo(info) {
     info.players.forEach(p => {
       const displayScore = (p.score !== undefined && p.score !== null) ? p.score : 0;
       const playerAvatar = (p.avatar && p.avatar !== 'undefined') ? p.avatar : DEFAULT_AVATAR;
+      const isDedicated = currentRoomSettings.gameMode === 'draw-one-host' && p.id === (info.dedicatedDrawerId || currentRoomSettings.dedicatedDrawerId);
       const card = document.createElement('div');
-      card.className = `waiting-player-card ${p.id === myPlayerId ? 'is-you' : ''}`;
+      card.className = `waiting-player-card ${p.id === myPlayerId ? 'is-you' : ''} ${isDedicated ? 'is-dedicated-drawer' : ''}`;
       const spectatorTag = p.isSpectator ? '<span class="spectator-tag">Khán giả</span>' : '';
+      const drawerBadge = isDedicated ? '<span class="drawer-assigned-badge" title="Họa sĩ được chỉ định vẽ">🎨</span>' : '';
+      const assignBtn = (isHost && currentRoomSettings.gameMode === 'draw-one-host' && !isDedicated && !p.isSpectator)
+        ? `<button type="button" class="btn-assign-drawer" data-player-id="${p.id}" title="Chỉ định người này vẽ">🎯 Chọn vẽ</button>`
+        : '';
+
       card.innerHTML = `
+        ${drawerBadge}
         <div class="card-avatar-wrapper">
           <span class="waiting-player-avatar">${playerAvatar}</span>
           ${p.isHost ? '<span class="host-crown-badge" title="Chủ phòng">👑</span>' : ''}
         </div>
         <div class="card-info-wrapper">
-          <span class="waiting-player-name">${escapeHtml(p.name || 'Người chơi')} ${p.id === myPlayerId ? '<small class="you-tag">(Bạn)</small>' : ''} ${spectatorTag}</span>
-          <span class="waiting-player-score-pill">${p.isSpectator ? 'Khán giả' : `${displayScore} pts`}</span>
+          <div class="waiting-player-name-row">
+            <span class="waiting-player-name">${escapeHtml(p.name || 'Người chơi')} ${p.id === myPlayerId ? '<small class="you-tag">(Bạn)</small>' : ''} ${spectatorTag}</span>
+          </div>
+          <div class="waiting-player-meta-row">
+            <span class="waiting-player-score-pill">${p.isSpectator ? 'Khán giả' : `${displayScore} pts`}</span>
+          </div>
+          ${assignBtn}
         </div>
       `;
       waitingPlayersGrid.appendChild(card);
     });
   }
 
-  info.players.forEach(p => {
-    if (p.id === myPlayerId) {
-      isHost = p.isHost;
-      if (isHost) {
-        if (waitingHostControls) waitingHostControls.style.display = 'block';
-        if (waitingGuestControls) waitingGuestControls.style.display = 'none';
-        if (hostTopbarActions) hostTopbarActions.style.display = 'flex';
-      } else {
-        if (waitingHostControls) waitingHostControls.style.display = 'none';
-        if (waitingGuestControls) waitingGuestControls.style.display = 'block';
-        if (hostTopbarActions) hostTopbarActions.style.display = 'none';
-      }
-    }
-  });
-
   // Kiểm tra cảnh báo số lượng người chơi trong phòng chờ
   if (playerCountWarning) {
-    if (info.players.length < 2) {
-      playerCountWarning.textContent = 'Cần ít nhất 2 người chơi để bắt đầu cuộc thi tài!';
+    const isDrawOneHost = currentRoomSettings.gameMode === 'draw-one-host';
+    const minRequired = isDrawOneHost ? 3 : 2;
+    const hasDedicated = info.players.some(p => p.id === (info.dedicatedDrawerId || currentRoomSettings.dedicatedDrawerId));
+
+    if (info.players.length < minRequired) {
+      playerCountWarning.textContent = isDrawOneHost
+        ? 'Cần ít nhất 3 người chơi để bắt đầu chế độ Chỉ Định Họa Sĩ!'
+        : 'Cần ít nhất 2 người chơi để bắt đầu cuộc thi tài!';
       playerCountWarning.style.color = '#f87171';
       if (waitingStartGameBtn) waitingStartGameBtn.disabled = true;
       if (waitingStartGameBtn) waitingStartGameBtn.style.opacity = '0.6';
+    } else if (isDrawOneHost && !hasDedicated) {
+      playerCountWarning.textContent = isHost
+        ? 'Chủ phòng hãy chọn 1 người vẽ (hoặc nhấn Bắt đầu để tự động vẽ)!'
+        : 'Đang đợi chủ phòng chỉ định Họa sĩ vẽ...';
+      playerCountWarning.style.color = '#fbbf24';
+      if (waitingStartGameBtn) waitingStartGameBtn.disabled = false;
+      if (waitingStartGameBtn) waitingStartGameBtn.style.opacity = '1';
     } else {
-      playerCountWarning.textContent = 'Đã đủ người! Chủ phòng có thể bắt đầu ngay 🚀';
+      playerCountWarning.textContent = 'Đã đủ điều kiện! Chủ phòng có thể bắt đầu ngay 🚀';
       playerCountWarning.style.color = '#34d399';
       if (waitingStartGameBtn) waitingStartGameBtn.disabled = false;
       if (waitingStartGameBtn) waitingStartGameBtn.style.opacity = '1';
@@ -1507,6 +1577,8 @@ document.addEventListener('click', (e) => {
 // Home / Lobby Events
 const playTurnBasedBtn = document.getElementById('playTurnBasedBtn');
 const modeTurnBased = document.getElementById('modeTurnBased');
+const playDrawOneHostBtn = document.getElementById('playDrawOneHostBtn');
+const modeDrawOneHost = document.getElementById('modeDrawOneHost');
 
 function handleCreateRoom() {
   const name = nicknameInput.value.trim() || 'Họa Sĩ';
@@ -1526,14 +1598,32 @@ if (createRoomBtn) {
 if (playTurnBasedBtn) {
   playTurnBasedBtn.addEventListener('click', (e) => {
     e.stopPropagation();
+    pendingLobbyMode = 'turn-based';
+    handleCreateRoom();
+  });
+}
+
+if (playDrawOneHostBtn) {
+  playDrawOneHostBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    pendingLobbyMode = 'draw-one-host';
     handleCreateRoom();
   });
 }
 
 if (modeTurnBased) {
   modeTurnBased.addEventListener('click', () => {
-    // Luôn chọn chế độ luân phiên
+    pendingLobbyMode = 'turn-based';
+    document.querySelectorAll('.game-mode-card').forEach(c => c.classList.remove('selected'));
     modeTurnBased.classList.add('selected');
+  });
+}
+
+if (modeDrawOneHost) {
+  modeDrawOneHost.addEventListener('click', () => {
+    pendingLobbyMode = 'draw-one-host';
+    document.querySelectorAll('.game-mode-card').forEach(c => c.classList.remove('selected'));
+    modeDrawOneHost.classList.add('selected');
   });
 }
 
@@ -1747,12 +1837,24 @@ function renderSettingsUI() {
     }
   }
 
-  // 3. Cập nhật chọn số người tối đa (Slider 2 - 16 người)
+  // 3. Cập nhật chọn số người tối đa (Slider 2 - 16 người hoặc 3 - 50 người cho draw-one-host)
+  const isDrawOneHost = currentRoomSettings.gameMode === 'draw-one-host';
   if (maxPlayersSlider) {
+    maxPlayersSlider.min = isDrawOneHost ? 3 : 2;
+    maxPlayersSlider.max = isDrawOneHost ? 50 : 16;
     maxPlayersSlider.value = currentRoomSettings.maxPlayers;
   }
   if (maxPlayersDisplay) {
     maxPlayersDisplay.textContent = `${currentRoomSettings.maxPlayers} người`;
+  }
+  const scaleLabels = document.querySelector('.slider-scale-labels');
+  if (scaleLabels) {
+    const minLabel = scaleLabels.querySelector('.min-label');
+    const midLabel = scaleLabels.querySelector('.mid-label');
+    const maxLabel = scaleLabels.querySelector('.max-label');
+    if (minLabel) minLabel.textContent = isDrawOneHost ? '3 người' : '2 người';
+    if (midLabel) midLabel.textContent = isDrawOneHost ? '25 người' : '8 người';
+    if (maxLabel) maxLabel.textContent = isDrawOneHost ? '50 người' : '16 người';
   }
 
   // 4. Cập nhật chọn số vòng thi đấu (3 - 6 vòng)
@@ -1804,6 +1906,14 @@ modeSelectGrid?.addEventListener('click', (e) => {
   const newMode = card.dataset.mode || 'turn-based';
   if (newMode !== currentRoomSettings.gameMode) {
     currentRoomSettings.gameMode = newMode;
+    if (newMode === 'draw-one-host') {
+      if (currentRoomSettings.maxPlayers < 3) currentRoomSettings.maxPlayers = 3;
+      if (currentRoomSettings.maxPlayers <= 16 && currentRoomSettings.maxPlayers === 8) {
+        currentRoomSettings.maxPlayers = 20;
+      }
+    } else if (newMode === 'turn-based') {
+      if (currentRoomSettings.maxPlayers > 16) currentRoomSettings.maxPlayers = 8;
+    }
     renderSettingsUI();
     sendRoomSettingsUpdate();
     sounds.playPop();
@@ -1957,9 +2067,36 @@ closeSettingsBtn?.addEventListener('click', closeSettingsModal);
 
 // Start Game by Host trong màn hình phòng chờ
 waitingStartGameBtn?.addEventListener('click', () => {
+  if (currentRoomSettings.gameMode === 'draw-one-host') {
+    if (!lastRoomInfo || lastRoomInfo.players.length < 3) {
+      showCustomAlert({
+        title: 'Chưa Đủ Người',
+        message: 'Chế độ Chỉ Định Họa Sĩ cần tối thiểu 3 người chơi để bắt đầu!',
+        type: 'warning',
+        icon: '👥'
+      });
+      return;
+    }
+  }
   for (const k in previousPlayerScores) delete previousPlayerScores[k];
   renderSidebarPlayersList();
   sendToServer({ action: 'start_game' });
+  sounds.playPop();
+});
+
+// Bắt sự kiện chỉ định Họa sĩ vẽ cho Host trong phòng chờ
+waitingPlayersGrid?.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn-assign-drawer');
+  if (!btn) return;
+  if (!isHost) return;
+  const targetPlayerId = btn.dataset.playerId;
+  if (targetPlayerId) {
+    sendToServer({
+      action: 'set_dedicated_drawer',
+      targetPlayerId: targetPlayerId
+    });
+    sounds.playPop();
+  }
 });
 
 // Copy Room Code Button in Dedicated Waiting Room

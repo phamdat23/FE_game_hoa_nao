@@ -845,6 +845,26 @@ body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.45) transparent;
+}
+
+.home-screen::-webkit-scrollbar {
+  width: 8px;
+}
+
+.home-screen::-webkit-scrollbar-track {
+  background: rgba(10, 15, 29, 0.4);
+}
+
+.home-screen::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.35);
+  border-radius: 9999px;
+}
+
+.home-screen::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.65);
 }
 
 .home-screen.active {
@@ -1145,10 +1165,11 @@ body {
   max-width: var(--max-content-width);
   width: 100%;
   margin: 0 auto;
-  padding: 36px 24px 20px;
+  padding: 32px 24px 80px; /* Đảm bảo khoảng cách cuộn rộng rãi, thoải mái scroll trên mọi thiết bị */
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 28px;
+  min-height: min-content;
 }
 
 .modes-hero-header {
@@ -1184,21 +1205,23 @@ body {
   max-width: 540px;
 }
 
-/* GAME MODES GRID */
+/* GAME MODES GRID: Cân đối, tự động co giãn và xuống dòng mượt mà khi có nhiều game */
 .game-modes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   gap: 24px;
+  width: 100%;
+  align-items: stretch;
 }
 
 .game-mode-card {
   background: linear-gradient(180deg, rgba(20, 29, 51, 0.85) 0%, rgba(13, 20, 36, 0.95) 100%);
   border: 1.5px solid rgba(255, 255, 255, 0.08);
-  border-radius: 32px; /* Bo góc cực kỳ mềm mại, hoàn toàn không có góc cạnh thô */
-  padding: 30px 26px;
+  border-radius: 28px;
+  padding: 26px 22px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   position: relative;
   transition: all var(--transition-normal);
   cursor: pointer;
@@ -1206,6 +1229,7 @@ body {
   overflow: hidden;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  height: 100%;
 }
 
 .game-mode-card:hover {
@@ -1233,8 +1257,8 @@ body {
 
 .card-status-badge {
   position: absolute;
-  top: 22px;
-  right: 22px;
+  top: 20px;
+  right: 20px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1246,6 +1270,19 @@ body {
   font-weight: 800;
   border: 1px solid rgba(16, 185, 129, 0.35);
   box-shadow: 0 2px 10px rgba(16, 185, 129, 0.25);
+  z-index: 2;
+}
+
+.card-status-badge.badge-active {
+  background: rgba(236, 72, 153, 0.18);
+  color: #f472b6;
+  border-color: rgba(236, 72, 153, 0.4);
+  box-shadow: 0 2px 10px rgba(236, 72, 153, 0.25);
+}
+
+.card-status-badge.badge-active .pulse-indicator-dot {
+  background: #ec4899;
+  box-shadow: 0 0 8px #ec4899;
 }
 
 .card-status-badge.badge-upcoming {
@@ -1264,16 +1301,17 @@ body {
 }
 
 .mode-icon-circle {
-  width: 70px;
-  height: 70px;
-  border-radius: 26px; /* Bo góc mượt mà hình squircle tròn trịa */
+  width: 66px;
+  height: 66px;
+  border-radius: 22px;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(236, 72, 153, 0.22));
   border: 1.5px solid rgba(129, 140, 248, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.3rem;
+  font-size: 2.2rem;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), inset 0 2px 10px rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
 }
 
 .rotate-effect {
@@ -1290,7 +1328,7 @@ body {
 .mode-content {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   flex: 1;
 }
 
@@ -1301,7 +1339,7 @@ body {
 }
 
 .mode-name {
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 900;
   color: #fff;
   letter-spacing: -0.01em;
@@ -1328,47 +1366,51 @@ body {
   line-height: 1.6;
   color: #94a3b8;
   margin: 0;
+  flex-grow: 1; /* Cân đối chiều cao, đẩy features và nút bấm về cùng một đáy thẳng hàng */
 }
 
 .mode-features-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 2px;
+  margin-top: auto;
+  padding-top: 4px;
 }
 
 .feature-item {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #cbd5e1;
   background: rgba(15, 23, 42, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 6px 14px;
-  border-radius: var(--radius-full); /* Viên thuốc pill bo tròn toàn diện */
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
 }
 
 .feature-icon {
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .card-action-bar {
-  margin-top: 8px;
+  margin-top: 14px;
 }
 
 .btn-play-mode {
   width: 100%;
-  padding: 14px 22px;
-  font-size: 0.98rem;
+  min-height: 48px;
+  padding: 12px 20px;
+  font-size: 0.95rem;
   font-weight: 800;
-  border-radius: var(--radius-full); /* Nút bo tròn viên thuốc hoàn hảo */
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   box-shadow: 0 4px 18px rgba(99, 102, 241, 0.45);
   transition: all var(--transition-fast);
 }
@@ -1423,11 +1465,12 @@ body {
     font-size: 1.7rem;
   }
   .home-main {
-    padding: 20px 16px;
-    gap: 20px;
+    padding: 20px 16px 90px;
+    gap: 16px;
   }
   .game-modes-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 
@@ -1862,18 +1905,25 @@ body {
 .waiting-players-grid.compact {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-auto-rows: 1fr;
   gap: 10px;
   align-content: start;
 }
 
 .waiting-player-card {
+  position: relative;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: var(--radius-lg);
-  padding: 10px 12px;
+  padding: 8px 10px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  min-height: 64px;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   transition: all var(--transition-fast);
 }
 
@@ -1895,8 +1945,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   background: rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-md);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1904,15 +1954,15 @@ body {
 }
 
 .waiting-player-avatar {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   line-height: 1;
 }
 
 .host-crown-badge {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  font-size: 0.95rem;
+  top: -7px;
+  right: -7px;
+  font-size: 0.9rem;
   line-height: 1;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
@@ -1921,13 +1971,23 @@ body {
 .card-info-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  overflow: hidden;
+  justify-content: center;
+  gap: 2px;
   flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.waiting-player-name-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .waiting-player-name {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   white-space: nowrap;
@@ -1936,6 +1996,8 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
+  flex: 1;
+  min-width: 0;
 }
 
 .you-tag {
@@ -1944,14 +2006,23 @@ body {
   font-weight: var(--font-weight-semibold);
 }
 
+.waiting-player-meta-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
 .waiting-player-score-pill {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: var(--font-weight-extrabold);
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.12);
   padding: 1px 6px;
   border-radius: var(--radius-full);
   align-self: flex-start;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 @media (max-width: 820px) {
@@ -1990,7 +2061,8 @@ body {
     min-height: 180px;
   }
   .waiting-players-grid.compact {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-auto-rows: 1fr;
     max-height: none;
     overflow: visible;
   }
@@ -2025,8 +2097,8 @@ body {
     height: 28px;
   }
   .game-modes-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 20px;
   }
 }
 
@@ -2046,7 +2118,7 @@ body {
     font-size: 2.6rem;
   }
   .game-modes-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
     gap: 28px;
   }
 }
@@ -2063,7 +2135,8 @@ body {
     width: 100%;
   }
   .game-modes-grid {
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 18px;
   }
 }
 
@@ -2424,7 +2497,7 @@ body {
   }
 
   .home-main {
-    padding: 16px 14px 64px;
+    padding: 16px 14px 96px;
     gap: 16px;
   }
 
@@ -3917,6 +3990,159 @@ body {
   color: #fff;
   transform: translateY(-1px);
 }
+
+/* ========================================================
+   DEDICATED DRAWER (CHẾ ĐỘ CHỈ ĐỊNH HỌA SĨ) UI STYLES
+   ======================================================== */
+.dedicated-drawer-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(168, 85, 247, 0.18));
+  border: 1.5px solid rgba(236, 72, 153, 0.4);
+  border-radius: 14px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.15);
+  animation: fadeIn 0.3s ease;
+}
+
+.drawer-banner-avatar {
+  font-size: 1.8rem;
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ec4899;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(236, 72, 153, 0.4);
+}
+
+.drawer-banner-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.drawer-banner-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #f472b6;
+}
+
+.drawer-banner-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawer-banner-badge {
+  background: linear-gradient(135deg, #ec4899, #d946ef);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
+  white-space: nowrap;
+}
+
+/* Thẻ người chơi khi được chỉ định làm họa sĩ */
+.waiting-player-card.is-dedicated-drawer {
+  border-color: #ec4899 !important;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.18), rgba(24, 24, 27, 0.95)) !important;
+  box-shadow: 0 0 18px rgba(236, 72, 153, 0.35) !important;
+}
+
+.drawer-assigned-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  background: linear-gradient(135deg, #ec4899, #a855f7);
+  border: 2px solid #18181b;
+  border-radius: 50%;
+  font-size: 0.78rem;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.6);
+  animation: pulseDot 2s infinite ease-in-out;
+  cursor: help;
+}
+
+/* Nút bấm chỉ định người vẽ dành cho Host */
+.btn-assign-drawer {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.25));
+  border: 1px solid rgba(236, 72, 153, 0.6);
+  color: #f472b6;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 2px;
+  line-height: 1.2;
+  white-space: nowrap;
+  outline: none;
+  align-self: flex-start;
+  box-shadow: 0 1px 4px rgba(236, 72, 153, 0.25);
+}
+
+.btn-assign-drawer:hover {
+  background: linear-gradient(135deg, #ec4899, #d946ef);
+  border-color: #ec4899;
+  color: #fff;
+  transform: translateY(-1px) scale(1.03);
+  box-shadow: 0 3px 10px rgba(236, 72, 153, 0.45);
+}
+
+.btn-assign-drawer:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Responsive Styles for Mobile */
+@media (max-width: 640px) {
+  .dedicated-drawer-banner {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+  .drawer-banner-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
+  }
+  .drawer-banner-name {
+    font-size: 0.95rem;
+  }
+  .drawer-banner-badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+  .btn-assign-drawer {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+}
+
 
 
 

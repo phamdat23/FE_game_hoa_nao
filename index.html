@@ -103,7 +103,45 @@
             </div>
             <div class="card-action-bar">
               <button class="btn btn-primary btn-play-mode" id="playTurnBasedBtn">
-                <span>Vào Chơi Ngay (Luân phiên)</span>
+                <span>Vào chơi</span>
+                <span class="arrow-icon">➔</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chế độ 2: Chỉ Định Họa Sĩ (Chế độ mới - Đang hoạt động) -->
+          <div class="game-mode-card" data-mode="draw-one-host" id="modeDrawOneHost">
+            <div class="card-status-badge badge-active">
+              <span class="pulse-indicator-dot"></span>
+              <span>Mới mở 🌟</span>
+            </div>
+            <div class="mode-icon-circle">🎯</div>
+            <div class="mode-content">
+              <div class="mode-header-row">
+                <h3 class="mode-name">Chỉ Định Họa Sĩ</h3>
+                <span class="mode-tag mode-tag-highlight">1 Họa sĩ</span>
+              </div>
+              <p class="mode-desc">
+                Host chỉ định 1 người vẽ xuyên suốt toàn bộ trận đấu, tất cả người chơi còn lại đua đoán từ với tối đa 50 điểm!
+              </p>
+              <div class="mode-features-list">
+                <div class="feature-item">
+                  <span class="feature-icon">🖌️</span>
+                  <span>1 người vẽ suốt trận</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">👥</span>
+                  <span>3 – 50 người chơi</span>
+                </div>
+                <div class="feature-item">
+                  <span class="feature-icon">⚡</span>
+                  <span>Tối đa 50đ / lượt</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-action-bar">
+              <button class="btn btn-primary btn-play-mode" id="playDrawOneHostBtn">
+                <span>Vào chơi</span>
                 <span class="arrow-icon">➔</span>
               </button>
             </div>
@@ -277,6 +315,17 @@
                     <span class="player-count-badge"><span id="waitingPlayerCount">1</span>/<span id="waitingMaxPlayerCount">8</span> người</span>
                   </div>
                 </div>
+
+                <!-- Banner hiển thị Họa sĩ được chỉ định khi ở chế độ draw-one-host -->
+                <div class="dedicated-drawer-banner" id="dedicatedDrawerBanner" style="display: none;">
+                  <div class="drawer-banner-avatar" id="dedicatedDrawerAvatar">🎨</div>
+                  <div class="drawer-banner-info">
+                    <span class="drawer-banner-title">Họa Sĩ Được Chỉ Định:</span>
+                    <span class="drawer-banner-name" id="dedicatedDrawerNameText">Chưa chọn</span>
+                  </div>
+                  <div class="drawer-banner-badge" id="dedicatedDrawerTag">🖌️ Vẽ suốt trận</div>
+                </div>
+
                 <div class="waiting-players-grid compact" id="waitingPlayersGrid">
                   <!-- Render danh sách thẻ người chơi theo thời gian thực -->
                 </div>
@@ -318,6 +367,15 @@
                 </div>
                 <div class="mode-card-title">Luân Phiên Cổ Điển</div>
                 <p class="mode-card-desc">Lần lượt từng người vẽ, các người chơi còn lại đua đoán từ khóa để nhận điểm thưởng.</p>
+              </div>
+
+              <div class="mode-select-card" data-mode="draw-one-host">
+                <div class="mode-card-header">
+                  <span class="mode-card-icon">🎯</span>
+                  <span class="mode-card-badge">Mới</span>
+                </div>
+                <div class="mode-card-title">Chỉ Định Họa Sĩ</div>
+                <p class="mode-card-desc">1 người vẽ suốt trận do Host chỉ định. Tối đa 50 người chơi, cộng tối đa 50đ/lượt.</p>
               </div>
 
               <div class="mode-select-card disabled" data-mode="speed-1v1" title="Chế độ chơi này hiện đang bị khóa (Sắp ra mắt)">
